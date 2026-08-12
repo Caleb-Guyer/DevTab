@@ -1,6 +1,7 @@
 import './style.css'
 
 const NOTE_STORAGE_KEY = 'devtab.quick-note'
+const THEME_STORAGE_KEY = 'devtab.theme'
 const NOTE_SAVE_DELAY = 300
 const WEATHER_REQUEST_TIMEOUT = 10000
 const GITHUB_USERNAME = 'Caleb-Guyer'
@@ -574,3 +575,117 @@ function setupGitHubWidget() {
 }
 
 setupGitHubWidget()
+
+function setupThemeControl() {
+  const root = document.documentElement
+  const themeInputs = [...document.querySelectorAll('input[name="theme"]')]
+  const themeStatus = document.querySelector('#theme-status')
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+  const validThemes = new Set(['system', 'light', 'dark'])
+  let selectedTheme = 'system'
+
+  function resolveTheme(theme) {
+    return theme === 'system' ? (systemTheme.matches ? 'dark' : 'light') : theme
+  }
+
+  function saveTheme(theme) {
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+    } catch (error) {
+      console.warn('DevTab could not save the theme preference.', error)
+    }
+  }
+
+  function applyTheme(theme, shouldSave = false) {
+    const resolvedTheme = resolveTheme(theme)
+    selectedTheme = theme
+    root.dataset.theme = resolvedTheme
+    root.style.colorScheme = resolvedTheme
+
+    const selectedInput = themeInputs.find((input) => input.value === theme)
+    if (selectedInput) selectedInput.checked = true
+
+    themeStatus.textContent =
+      theme === 'system'
+        ? `System theme active (${resolvedTheme}).`
+        : `${theme[0].toUpperCase()}${theme.slice(1)} theme active.`
+
+    if (shouldSave) saveTheme(theme)
+  }
+
+  function loadTheme() {
+    try {
+      const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
+      if (validThemes.has(storedTheme)) selectedTheme = storedTheme
+    } catch (error) {
+      console.warn('DevTab could not load the theme preference.', error)
+    }
+
+    applyTheme(selectedTheme)
+  }
+
+  function toggleTheme() {
+    const nextTheme = root.dataset.theme === 'dark' ? 'light' : 'dark'
+    applyTheme(nextTheme, true)
+  }
+
+  themeInputs.forEach((input) => {
+    input.addEventListener('change', () => {
+      if (input.checked && validThemes.has(input.value)) {
+        applyTheme(input.value, true)
+      }
+    })
+  })
+
+  systemTheme.addEventListener('change', () => {
+    if (selectedTheme === 'system') applyTheme('system')
+  })
+
+  loadTheme()
+  return toggleTheme
+}
+
+function setupKeyboardShortcuts(toggleTheme) {
+  const searchInput = document.querySelector('#web-search')
+  const notesInput = document.querySelector('#quick-note')
+
+  function isEditing(target) {
+    return (
+      target instanceof HTMLElement &&
+      (target.matches('input, textarea, select') || target.isContentEditable)
+    )
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (
+      event.defaultPrevented ||
+      event.repeat ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      isEditing(event.target)
+    ) {
+      return
+    }
+
+    if (event.key === '/') {
+      event.preventDefault()
+      searchInput.focus()
+      return
+    }
+
+    if (event.key.toLowerCase() === 'n') {
+      event.preventDefault()
+      notesInput.focus()
+      return
+    }
+
+    if (event.key.toLowerCase() === 't') {
+      event.preventDefault()
+      toggleTheme()
+    }
+  })
+}
+
+const toggleTheme = setupThemeControl()
+setupKeyboardShortcuts(toggleTheme)

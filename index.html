@@ -41,9 +41,16 @@
               type="search"
               placeholder="Search the web"
               autocomplete="off"
+              aria-keyshortcuts="/"
             />
             <button type="submit">Search</button>
           </form>
+
+          <ul class="shortcut-guide" aria-label="Keyboard shortcuts">
+            <li><kbd>/</kbd><span>Search</span></li>
+            <li><kbd>N</kbd><span>Notes</span></li>
+            <li><kbd>T</kbd><span>Theme</span></li>
+          </ul>
         </section>
 
         <div class="dashboard-grid">
@@ -207,10 +214,15 @@
               name="quick-note"
               rows="7"
               placeholder="Write down an idea, command, or reminder&hellip;"
+              aria-keyshortcuts="N"
             ></textarea>
           </section>
 
-          <aside class="card settings-card" aria-labelledby="settings-heading">
+          <aside
+            class="card settings-card"
+            aria-labelledby="settings-heading"
+            aria-keyshortcuts="T"
+          >
             <header class="card-header">
               <div>
                 <p class="card-kicker">Preferences</p>
@@ -237,7 +249,9 @@
                   </label>
                 </div>
               </fieldset>
-              <p class="settings-note">Theme switching will be connected in a later step.</p>
+              <p id="theme-status" class="settings-note" role="status" aria-live="polite">
+                System theme active.
+              </p>
             </form>
           </aside>
         </div>
