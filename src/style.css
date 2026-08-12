@@ -609,6 +609,80 @@ h2 {
 
 /* Notes and settings ------------------------------------------------------ */
 
+.note-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.save-status::before {
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0.65rem rgb(109 246 211 / 55%);
+  content: "";
+}
+
+.save-status[data-state="saving"]::before {
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid var(--accent);
+}
+
+.save-status[data-state="error"] {
+  color: var(--text-soft);
+}
+
+.save-status[data-state="error"]::before {
+  border: 1px solid currentColor;
+  background: transparent;
+  box-shadow: none;
+}
+
+.clear-note {
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  color: var(--text-soft);
+  background: var(--surface-raised);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition:
+    border-color var(--transition),
+    color var(--transition),
+    opacity var(--transition),
+    transform var(--transition);
+}
+
+.clear-note:hover:not(:disabled) {
+  border-color: var(--accent-line);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.clear-note:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 textarea {
   width: 100%;
   min-height: 9.5rem;

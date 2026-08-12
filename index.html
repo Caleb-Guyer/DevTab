@@ -145,7 +145,18 @@
                 <p class="card-kicker">Scratchpad</p>
                 <h2 id="notes-heading">Notes</h2>
               </div>
-              <span class="muted">Not saved yet</span>
+              <div class="note-actions">
+                <span
+                  id="note-status"
+                  class="save-status"
+                  role="status"
+                  aria-live="polite"
+                  data-state="saved"
+                >Saved</span>
+                <button id="clear-note" class="clear-note" type="button" disabled>
+                  Clear
+                </button>
+              </div>
             </header>
 
             <label class="visually-hidden" for="quick-note">Quick note</label>

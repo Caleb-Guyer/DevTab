@@ -17,6 +17,13 @@ putting frequently used links, project shortcuts, and lightweight productivity
 tools in one fast, customizable interface. The project will use a custom UI and
 browser-native technologies rather than a one-click website builder.
 
+## Current features
+
+- A live local clock and date display
+- Web search and a starter set of developer quick links
+- A scratchpad that automatically saves the note in the browser
+- A responsive custom interface for desktop and mobile screens
+
 ## Planned features
 
 - A customizable dashboard for developer links and project shortcuts
