@@ -1,62 +1,51 @@
 # DevTab
 
-DevTab is a customizable, developer-focused new tab page being created as a
-[Hack Club Stardance](https://stardance.hackclub.com/) project. Its goal is to
-turn an empty browser tab into a useful home base for common development tasks
-without becoming distracting or complicated.
+DevTab is a customizable, developer-focused new tab dashboard built for
+[Hack Club Stardance](https://stardance.hackclub.com/). It turns an empty browser
+tab into a fast home base for search, project links, live information, and
+lightweight productivity tools.
 
 **Live site:** [caleb-guyer.github.io/DevTab](https://caleb-guyer.github.io/DevTab/)
 
-> [!NOTE]
-> DevTab is currently in its initial development phase. The repository contains
-> the Vite foundation and a temporary setup screen; the features below are
-> planned and have not been implemented yet.
+## Features
 
-## Purpose
-
-Developers open new tabs constantly. DevTab will make that space useful by
-putting frequently used links, project shortcuts, and lightweight productivity
-tools in one fast, customizable interface. The project will use a custom UI and
-browser-native technologies rather than a one-click website builder.
-
-## Current features
-
-- A live local clock and date display
-- Live local weather using browser location and real API data
+- Live local clock and date
+- Web search and developer quick links
+- Current weather based on browser location, powered by real API data
 - Public GitHub profile statistics and recently updated repositories
-- Web search and a starter set of developer quick links
-- A scratchpad that automatically saves the note in the browser
+- Scratchpad notes that automatically persist between visits
 - Keyboard shortcuts for search (`/`), notes (`N`), and theme switching (`T`)
-- Locally saved appearance and dashboard visibility preferences
-- A responsive custom interface for desktop and mobile screens
+- Customizable accent color, dark or light mode, background intensity, and card visibility
+- Responsive, accessible interface for desktop and mobile screens
 
-## Planned features
+## Keyboard shortcuts
 
-- A customizable dashboard for developer links and project shortcuts
-- Fast search and keyboard-friendly navigation
-- A command-style launcher for common destinations and actions
-- Useful at-a-glance information, such as the current time and focus state
-- Preferences saved locally in the browser
-- Responsive layouts and accessible light and dark themes
+| Key | Action |
+| --- | --- |
+| `/` | Focus the search field |
+| `N` | Focus the notes field |
+| `T` | Toggle dark or light mode |
 
-The feature set may evolve as the project is designed and tested.
+Shortcuts are disabled while typing in an input or text area.
 
 ## Technologies
 
-- HTML5 for structure
-- Custom CSS for layout, styling, themes, and responsive behavior
-- Vanilla JavaScript for interactivity and local persistence
-- [Vite](https://vite.dev/) for the development server and production builds
+- Semantic HTML5
+- Custom CSS with responsive layouts and themes
+- Vanilla JavaScript
+- [Vite](https://vite.dev/) for development and production builds
+- Browser `localStorage` for notes and preferences
 - [Open-Meteo](https://open-meteo.com/) for current weather data
-- [BigDataCloud](https://www.bigdatacloud.com/) for client-side location names
+- [BigDataCloud](https://www.bigdatacloud.com/) for location names
 - [GitHub REST API](https://docs.github.com/en/rest) for public profile and repository data
+- GitHub Actions and GitHub Pages for continuous deployment
 
 ## Local development
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) 20.19 or newer
-- npm, which is included with Node.js
+- npm, included with Node.js
 
 ### Setup
 
@@ -67,7 +56,7 @@ The feature set may evolve as the project is designed and tested.
    cd DevTab
    ```
 
-2. Install the dependencies:
+2. Install dependencies:
 
    ```bash
    npm install
@@ -93,22 +82,20 @@ On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd install` and
 | `npm run build` | Create an optimized production build in `dist/` |
 | `npm run preview` | Preview the production build locally |
 
+## Data and privacy
+
+- Notes and dashboard preferences remain in the browser's local storage.
+- Weather requests use the browser's location only after permission is granted.
+- GitHub information comes from the public API and does not require an access token.
+
 ## Deployment
 
-Pushes to `main` automatically build and deploy DevTab to GitHub Pages using
-the workflow in `.github/workflows/deploy-pages.yml`. The workflow installs the
-locked dependencies with `npm ci`, creates the Vite production build in
-`dist/`, uploads that directory as a Pages artifact, and deploys it.
-
-## AI usage
-
-OpenAI Codex is being used as a development assistant for tasks such as project
-scaffolding, documentation, brainstorming, debugging, and code review. The
-project is directed and reviewed by the author, and its design and feature
-decisions are made deliberately throughout development. DevTab is not being
-created with an AI one-click website builder.
+Pushes to `main` automatically build and deploy DevTab to GitHub Pages through
+`.github/workflows/deploy-pages.yml`. The workflow installs locked dependencies,
+creates the production build, uploads `dist/`, and publishes it to the live site.
 
 ## Project status
 
-DevTab is under active development. A public deployment link and usage guide
-will be added once the first complete feature is ready.
+DevTab 1.0 is feature-complete and publicly deployed. Future improvements may
+include editable quick links, a command launcher, and additional optional
+dashboard cards.
