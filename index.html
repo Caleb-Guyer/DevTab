@@ -10,7 +10,186 @@
     <title>DevTab</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app" class="app-shell">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="DevTab home">
+          <span class="brand-mark" aria-hidden="true">D</span>
+          <span>DevTab</span>
+        </a>
+
+        <time id="clock" class="clock" datetime="" aria-label="Local date and time">
+          <span id="clock-time" class="clock-time">--:--</span>
+          <span id="clock-date" class="clock-date">Loading date</span>
+        </time>
+      </header>
+
+      <main class="dashboard">
+        <section class="search-area" aria-labelledby="search-heading">
+          <p class="eyebrow">Your developer workspace</p>
+          <h1 id="search-heading">Where do you want to go?</h1>
+
+          <form
+            class="search-form"
+            role="search"
+            action="https://www.google.com/search"
+            method="get"
+          >
+            <label class="visually-hidden" for="web-search">Search the web</label>
+            <input
+              id="web-search"
+              name="q"
+              type="search"
+              placeholder="Search the web"
+              autocomplete="off"
+            />
+            <button type="submit">Search</button>
+          </form>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="card weather-card" aria-labelledby="weather-heading">
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">Local forecast</p>
+                <h2 id="weather-heading">Weather</h2>
+              </div>
+              <span class="card-icon" aria-hidden="true">☁</span>
+            </header>
+
+            <div class="weather-summary">
+              <p class="temperature">--°</p>
+              <div>
+                <p class="weather-condition">Location not set</p>
+                <p class="muted">Weather details will appear here.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="card github-card" aria-labelledby="github-heading">
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">Developer activity</p>
+                <h2 id="github-heading">GitHub</h2>
+              </div>
+              <a
+                class="text-link"
+                href="https://github.com/Caleb-Guyer"
+                target="_blank"
+                rel="noreferrer"
+              >View profile</a>
+            </header>
+
+            <div class="profile-summary">
+              <span class="profile-avatar" aria-hidden="true">CG</span>
+              <div>
+                <p class="profile-name">@Caleb-Guyer</p>
+                <p class="muted">Activity summary coming soon.</p>
+              </div>
+            </div>
+
+            <dl class="github-stats">
+              <div>
+                <dt>Repositories</dt>
+                <dd>--</dd>
+              </div>
+              <div>
+                <dt>Followers</dt>
+                <dd>--</dd>
+              </div>
+              <div>
+                <dt>Following</dt>
+                <dd>--</dd>
+              </div>
+            </dl>
+          </section>
+
+          <nav class="card quick-links" aria-labelledby="quick-links-heading">
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">Bookmarks</p>
+                <h2 id="quick-links-heading">Quick links</h2>
+              </div>
+            </header>
+
+            <ul class="link-list">
+              <li>
+                <a href="https://github.com/" target="_blank" rel="noreferrer">
+                  <span class="link-mark" aria-hidden="true">GH</span>
+                  <span>GitHub</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://developer.mozilla.org/" target="_blank" rel="noreferrer">
+                  <span class="link-mark" aria-hidden="true">MDN</span>
+                  <span>MDN</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://vite.dev/" target="_blank" rel="noreferrer">
+                  <span class="link-mark" aria-hidden="true">V</span>
+                  <span>Vite</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://stackoverflow.com/" target="_blank" rel="noreferrer">
+                  <span class="link-mark" aria-hidden="true">SO</span>
+                  <span>Stack Overflow</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+
+          <section class="card notes-card" aria-labelledby="notes-heading">
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">Scratchpad</p>
+                <h2 id="notes-heading">Notes</h2>
+              </div>
+              <span class="muted">Not saved yet</span>
+            </header>
+
+            <label class="visually-hidden" for="quick-note">Quick note</label>
+            <textarea
+              id="quick-note"
+              name="quick-note"
+              rows="7"
+              placeholder="Write down an idea, command, or reminder…"
+            ></textarea>
+          </section>
+
+          <aside class="card settings-card" aria-labelledby="settings-heading">
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">Preferences</p>
+                <h2 id="settings-heading">Settings</h2>
+              </div>
+              <span class="card-icon" aria-hidden="true">⚙</span>
+            </header>
+
+            <form class="settings-form">
+              <fieldset>
+                <legend>Theme</legend>
+                <div class="theme-options">
+                  <label>
+                    <input type="radio" name="theme" value="system" checked />
+                    <span>System</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="theme" value="light" />
+                    <span>Light</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="theme" value="dark" />
+                    <span>Dark</span>
+                  </label>
+                </div>
+              </fieldset>
+              <p class="settings-note">Theme switching will be connected in a later step.</p>
+            </form>
+          </aside>
+        </div>
+      </main>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
