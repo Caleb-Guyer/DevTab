@@ -88,13 +88,19 @@
             </p>
           </section>
 
-          <section class="card github-card" aria-labelledby="github-heading">
+          <section
+            class="card github-card"
+            aria-labelledby="github-heading"
+            aria-busy="true"
+            data-state="loading"
+          >
             <header class="card-header">
               <div>
                 <p class="card-kicker">Developer activity</p>
                 <h2 id="github-heading">GitHub</h2>
               </div>
               <a
+                id="github-profile-link"
                 class="text-link"
                 href="https://github.com/Caleb-Guyer"
                 target="_blank"
@@ -102,28 +108,41 @@
               >View profile</a>
             </header>
 
-            <div class="profile-summary">
-              <span class="profile-avatar" aria-hidden="true">CG</span>
+            <div class="profile-summary" aria-live="polite">
+              <img id="github-avatar" class="profile-avatar" alt="" hidden />
+              <span id="github-avatar-placeholder" class="profile-avatar" aria-hidden="true">
+                GH
+              </span>
               <div>
-                <p class="profile-name">@Caleb-Guyer</p>
-                <p class="muted">Activity summary coming soon.</p>
+                <p id="github-username" class="profile-name">@Caleb-Guyer</p>
+                <p id="github-summary" class="muted">Loading public profile&hellip;</p>
               </div>
             </div>
 
             <dl class="github-stats">
               <div>
-                <dt>Repositories</dt>
-                <dd>--</dd>
+                <dt>Public repositories</dt>
+                <dd id="github-repository-count">--</dd>
               </div>
               <div>
                 <dt>Followers</dt>
-                <dd>--</dd>
-              </div>
-              <div>
-                <dt>Following</dt>
-                <dd>--</dd>
+                <dd id="github-follower-count">--</dd>
               </div>
             </dl>
+
+            <section class="recent-repositories" aria-labelledby="repositories-heading">
+              <div class="repository-heading-row">
+                <h3 id="repositories-heading">Recently updated</h3>
+                <span class="repository-source">Public repositories</span>
+              </div>
+              <ul id="github-repositories" class="repository-list" aria-live="polite">
+                <li class="repository-message">Loading repositories&hellip;</li>
+              </ul>
+            </section>
+
+            <button id="github-retry" class="github-retry" type="button" hidden>
+              Retry GitHub
+            </button>
           </section>
 
           <nav class="card quick-links" aria-labelledby="quick-links-heading">

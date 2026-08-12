@@ -3,6 +3,10 @@ import './style.css'
 const NOTE_STORAGE_KEY = 'devtab.quick-note'
 const NOTE_SAVE_DELAY = 300
 const WEATHER_REQUEST_TIMEOUT = 10000
+const GITHUB_USERNAME = 'Caleb-Guyer'
+const GITHUB_API_VERSION = '2022-11-28'
+const GITHUB_REPOSITORY_LIMIT = 4
+const GITHUB_REQUEST_TIMEOUT = 10000
 
 const clock = document.querySelector('#clock')
 const clockTime = document.querySelector('#clock-time')
@@ -332,3 +336,241 @@ function setupWeatherWidget() {
 }
 
 setupWeatherWidget()
+
+function formatGitHubCount(value) {
+  return new Intl.NumberFormat().format(value)
+}
+
+function formatRepositoryDate(dateString) {
+  const date = new Date(dateString)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Update date unavailable'
+  }
+
+  return `Updated ${new Intl.DateTimeFormat([], {
+    month: 'short',
+    day: 'numeric',
+    year: date.getFullYear() === new Date().getFullYear() ? undefined : 'numeric',
+  }).format(date)}`
+}
+
+async function fetchGitHubResource(path) {
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), GITHUB_REQUEST_TIMEOUT)
+
+  try {
+    const response = await window.fetch(`https://api.github.com${path}`, {
+      signal: controller.signal,
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': GITHUB_API_VERSION,
+      },
+    })
+
+    if (!response.ok) {
+      const remainingRequests = response.headers.get('x-ratelimit-remaining')
+
+      if ([403, 429].includes(response.status) && remainingRequests === '0') {
+        const resetTimestamp = Number(response.headers.get('x-ratelimit-reset')) * 1000
+        const resetTime = Number.isFinite(resetTimestamp)
+          ? new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit' }).format(
+              new Date(resetTimestamp),
+            )
+          : null
+
+        throw new Error(
+          resetTime
+            ? `GitHub's public API limit was reached. Try again after ${resetTime}.`
+            : "GitHub's public API limit was reached. Try again later.",
+        )
+      }
+
+      if (response.status === 404) {
+        throw new Error('The requested GitHub profile could not be found.')
+      }
+
+      throw new Error('GitHub could not complete the request. Try again shortly.')
+    }
+
+    return await response.json()
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('The GitHub request timed out. Try again.')
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error('Could not connect to GitHub. Check your connection.')
+    }
+
+    if (error instanceof SyntaxError) {
+      throw new Error('GitHub returned an unreadable response. Try again.')
+    }
+
+    throw error
+  } finally {
+    window.clearTimeout(timeout)
+  }
+}
+
+function createRepositoryItem(repository) {
+  const item = document.createElement('li')
+  const link = document.createElement('a')
+  const titleRow = document.createElement('span')
+  const name = document.createElement('span')
+  const description = document.createElement('span')
+  const metadata = document.createElement('span')
+  const language = document.createElement('span')
+  const updated = document.createElement('span')
+
+  item.className = 'repository-item'
+  link.className = 'repository-link'
+  link.href = repository.html_url
+  link.target = '_blank'
+  link.rel = 'noreferrer'
+  link.setAttribute('aria-label', `Open ${repository.name} on GitHub`)
+
+  titleRow.className = 'repository-title-row'
+  name.className = 'repository-name'
+  name.textContent = repository.name
+  description.className = 'repository-description'
+  description.textContent = repository.description || 'No description provided.'
+  metadata.className = 'repository-metadata'
+  language.className = 'repository-language'
+  language.textContent = repository.language || 'Code'
+  updated.textContent = formatRepositoryDate(repository.updated_at)
+
+  titleRow.append(name)
+  metadata.append(language, updated)
+  link.append(titleRow, description, metadata)
+  item.append(link)
+
+  return item
+}
+
+function setupGitHubWidget() {
+  const githubCard = document.querySelector('.github-card')
+  const profileLink = document.querySelector('#github-profile-link')
+  const avatar = document.querySelector('#github-avatar')
+  const avatarPlaceholder = document.querySelector('#github-avatar-placeholder')
+  const username = document.querySelector('#github-username')
+  const summary = document.querySelector('#github-summary')
+  const repositoryCount = document.querySelector('#github-repository-count')
+  const followerCount = document.querySelector('#github-follower-count')
+  const repositoryList = document.querySelector('#github-repositories')
+  const retryButton = document.querySelector('#github-retry')
+
+  function showRepositoryMessage(message) {
+    const item = document.createElement('li')
+    item.className = 'repository-message'
+    item.textContent = message
+    repositoryList.replaceChildren(item)
+  }
+
+  function showLoadingState() {
+    githubCard.dataset.state = 'loading'
+    githubCard.setAttribute('aria-busy', 'true')
+    avatar.hidden = true
+    avatar.removeAttribute('src')
+    avatarPlaceholder.hidden = false
+    avatarPlaceholder.textContent = 'GH'
+    username.textContent = `@${GITHUB_USERNAME}`
+    summary.textContent = 'Loading public profile…'
+    repositoryCount.textContent = '--'
+    followerCount.textContent = '--'
+    showRepositoryMessage('Loading repositories…')
+    retryButton.hidden = true
+    retryButton.disabled = true
+  }
+
+  function showProfile(profile, repositories) {
+    githubCard.dataset.state = 'ready'
+    githubCard.setAttribute('aria-busy', 'false')
+    profileLink.href = profile.html_url
+    username.textContent = `@${profile.login}`
+    summary.textContent = profile.bio || profile.name || 'Public GitHub profile'
+    repositoryCount.textContent = formatGitHubCount(profile.public_repos)
+    followerCount.textContent = formatGitHubCount(profile.followers)
+    avatar.src = profile.avatar_url
+    avatar.alt = `${profile.login}'s GitHub avatar`
+    avatar.hidden = false
+    avatarPlaceholder.hidden = true
+    retryButton.hidden = true
+    retryButton.disabled = false
+
+    if (repositories.length === 0) {
+      showRepositoryMessage('No public repositories found.')
+      return
+    }
+
+    repositoryList.replaceChildren(...repositories.map(createRepositoryItem))
+  }
+
+  function showErrorState(error) {
+    console.warn('DevTab could not load GitHub data.', error)
+    githubCard.dataset.state = 'error'
+    githubCard.setAttribute('aria-busy', 'false')
+    avatar.hidden = true
+    avatarPlaceholder.hidden = false
+    avatarPlaceholder.textContent = '!'
+    username.textContent = `@${GITHUB_USERNAME}`
+    summary.textContent = error.message || 'GitHub data is unavailable.'
+    repositoryCount.textContent = '--'
+    followerCount.textContent = '--'
+    showRepositoryMessage('Recent repositories could not be loaded.')
+    retryButton.hidden = false
+    retryButton.disabled = false
+  }
+
+  async function loadGitHubData() {
+    showLoadingState()
+
+    try {
+      const repositoryParams = new URLSearchParams({
+        sort: 'updated',
+        direction: 'desc',
+        type: 'owner',
+        per_page: GITHUB_REPOSITORY_LIMIT.toString(),
+      })
+      const [profile, repositories] = await Promise.all([
+        fetchGitHubResource(`/users/${encodeURIComponent(GITHUB_USERNAME)}`),
+        fetchGitHubResource(
+          `/users/${encodeURIComponent(GITHUB_USERNAME)}/repos?${repositoryParams}`,
+        ),
+      ])
+
+      if (
+        typeof profile?.login !== 'string' ||
+        typeof profile?.html_url !== 'string' ||
+        typeof profile?.avatar_url !== 'string' ||
+        !Number.isInteger(profile?.public_repos) ||
+        !Number.isInteger(profile?.followers) ||
+        !Array.isArray(repositories)
+      ) {
+        throw new Error('GitHub returned incomplete profile data. Try again.')
+      }
+
+      const validRepositories = repositories.filter(
+        (repository) =>
+          typeof repository?.name === 'string' &&
+          typeof repository?.html_url === 'string' &&
+          typeof repository?.updated_at === 'string',
+      )
+
+      showProfile(profile, validRepositories)
+    } catch (error) {
+      showErrorState(error)
+    }
+  }
+
+  avatar.addEventListener('error', () => {
+    avatar.hidden = true
+    avatarPlaceholder.hidden = false
+    avatarPlaceholder.textContent = username.textContent.slice(1, 3).toUpperCase()
+  })
+
+  retryButton.addEventListener('click', loadGitHubData)
+  loadGitHubData()
+}
+
+setupGitHubWidget()
