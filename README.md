@@ -5,6 +5,8 @@ DevTab is a customizable, developer-focused new tab page being created as a
 turn an empty browser tab into a useful home base for common development tasks
 without becoming distracting or complicated.
 
+**Live site:** [caleb-guyer.github.io/DevTab](https://caleb-guyer.github.io/DevTab/)
+
 > [!NOTE]
 > DevTab is currently in its initial development phase. The repository contains
 > the Vite foundation and a temporary setup screen; the features below are
@@ -90,6 +92,13 @@ On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd install` and
 | `npm run dev` | Start the Vite development server with hot reload |
 | `npm run build` | Create an optimized production build in `dist/` |
 | `npm run preview` | Preview the production build locally |
+
+## Deployment
+
+Pushes to `main` automatically build and deploy DevTab to GitHub Pages using
+the workflow in `.github/workflows/deploy-pages.yml`. The workflow installs the
+locked dependencies with `npm ci`, creates the Vite production build in
+`dist/`, uploads that directory as a Pages artifact, and deploys it.
 
 ## AI usage
 
