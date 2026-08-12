@@ -54,7 +54,11 @@
         </section>
 
         <div class="dashboard-grid">
-          <section class="card weather-card" aria-labelledby="weather-heading">
+          <section
+            class="card weather-card"
+            aria-labelledby="weather-heading"
+            data-dashboard-card="weather"
+          >
             <header class="card-header">
               <div>
                 <p class="card-kicker">Local forecast</p>
@@ -100,6 +104,7 @@
             aria-labelledby="github-heading"
             aria-busy="true"
             data-state="loading"
+            data-dashboard-card="github"
           >
             <header class="card-header">
               <div>
@@ -152,7 +157,11 @@
             </button>
           </section>
 
-          <nav class="card quick-links" aria-labelledby="quick-links-heading">
+          <nav
+            class="card quick-links"
+            aria-labelledby="quick-links-heading"
+            data-dashboard-card="links"
+          >
             <header class="card-header">
               <div>
                 <p class="card-kicker">Bookmarks</p>
@@ -188,7 +197,11 @@
             </ul>
           </nav>
 
-          <section class="card notes-card" aria-labelledby="notes-heading">
+          <section
+            class="card notes-card"
+            aria-labelledby="notes-heading"
+            data-dashboard-card="notes"
+          >
             <header class="card-header">
               <div>
                 <p class="card-kicker">Scratchpad</p>
@@ -231,26 +244,100 @@
               <span class="card-icon" aria-hidden="true">CFG</span>
             </header>
 
-            <form class="settings-form">
-              <fieldset>
-                <legend>Theme</legend>
-                <div class="theme-options">
-                  <label>
-                    <input type="radio" name="theme" value="system" checked />
-                    <span>System</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="theme" value="light" />
-                    <span>Light</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="theme" value="dark" />
-                    <span>Dark</span>
-                  </label>
-                </div>
-              </fieldset>
-              <p id="theme-status" class="settings-note" role="status" aria-live="polite">
-                System theme active.
+            <form id="settings-form" class="settings-form">
+              <div class="settings-grid">
+                <fieldset class="preference-group">
+                  <legend>Mode</legend>
+                  <div class="choice-options theme-options">
+                    <label>
+                      <input type="radio" name="theme" value="system" checked />
+                      <span>System</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="theme" value="light" />
+                      <span>Light</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="theme" value="dark" />
+                      <span>Dark</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="preference-group">
+                  <legend>Accent color</legend>
+                  <div class="choice-options accent-options">
+                    <label>
+                      <input type="radio" name="accent" value="mint" checked />
+                      <span class="accent-swatch accent-mint" aria-hidden="true"></span>
+                      <span>Mint</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="accent" value="violet" />
+                      <span class="accent-swatch accent-violet" aria-hidden="true"></span>
+                      <span>Violet</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="accent" value="amber" />
+                      <span class="accent-swatch accent-amber" aria-hidden="true"></span>
+                      <span>Amber</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="accent" value="azure" />
+                      <span class="accent-swatch accent-azure" aria-hidden="true"></span>
+                      <span>Azure</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="preference-group">
+                  <legend>Background intensity</legend>
+                  <div class="choice-options intensity-options">
+                    <label>
+                      <input type="radio" name="background-intensity" value="subtle" />
+                      <span>Subtle</span>
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="background-intensity"
+                        value="balanced"
+                        checked
+                      />
+                      <span>Balanced</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="background-intensity" value="strong" />
+                      <span>Strong</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="preference-group">
+                  <legend>Visible cards</legend>
+                  <div class="choice-options card-visibility-options">
+                    <label>
+                      <input type="checkbox" name="visible-card" value="weather" checked />
+                      <span>Weather</span>
+                    </label>
+                    <label>
+                      <input type="checkbox" name="visible-card" value="github" checked />
+                      <span>GitHub</span>
+                    </label>
+                    <label>
+                      <input type="checkbox" name="visible-card" value="links" checked />
+                      <span>Quick links</span>
+                    </label>
+                    <label>
+                      <input type="checkbox" name="visible-card" value="notes" checked />
+                      <span>Notes</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+
+              <p id="settings-status" class="settings-note" role="status" aria-live="polite">
+                Preferences loaded.
               </p>
             </form>
           </aside>

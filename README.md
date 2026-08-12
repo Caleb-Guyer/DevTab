@@ -25,6 +25,7 @@ browser-native technologies rather than a one-click website builder.
 - Web search and a starter set of developer quick links
 - A scratchpad that automatically saves the note in the browser
 - Keyboard shortcuts for search (`/`), notes (`N`), and theme switching (`T`)
+- Locally saved appearance and dashboard visibility preferences
 - A responsive custom interface for desktop and mobile screens
 
 ## Planned features

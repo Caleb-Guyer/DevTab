@@ -1,13 +1,20 @@
 import './style.css'
 
 const NOTE_STORAGE_KEY = 'devtab.quick-note'
-const THEME_STORAGE_KEY = 'devtab.theme'
+const SETTINGS_STORAGE_KEY = 'devtab.settings'
+const LEGACY_THEME_STORAGE_KEY = 'devtab.theme'
 const NOTE_SAVE_DELAY = 300
 const WEATHER_REQUEST_TIMEOUT = 10000
 const GITHUB_USERNAME = 'Caleb-Guyer'
 const GITHUB_API_VERSION = '2022-11-28'
 const GITHUB_REPOSITORY_LIMIT = 4
 const GITHUB_REQUEST_TIMEOUT = 10000
+const DEFAULT_SETTINGS = Object.freeze({
+  theme: 'system',
+  accent: 'mint',
+  backgroundIntensity: 'balanced',
+  visibleCards: ['weather', 'github', 'links', 'notes'],
+})
 
 const clock = document.querySelector('#clock')
 const clockTime = document.querySelector('#clock-time')
@@ -576,76 +583,165 @@ function setupGitHubWidget() {
 
 setupGitHubWidget()
 
-function setupThemeControl() {
+function setupSettingsControl() {
   const root = document.documentElement
+  const settingsForm = document.querySelector('#settings-form')
   const themeInputs = [...document.querySelectorAll('input[name="theme"]')]
-  const themeStatus = document.querySelector('#theme-status')
+  const accentInputs = [...document.querySelectorAll('input[name="accent"]')]
+  const intensityInputs = [
+    ...document.querySelectorAll('input[name="background-intensity"]'),
+  ]
+  const cardInputs = [...document.querySelectorAll('input[name="visible-card"]')]
+  const dashboardCards = [...document.querySelectorAll('[data-dashboard-card]')]
+  const settingsStatus = document.querySelector('#settings-status')
   const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
   const validThemes = new Set(['system', 'light', 'dark'])
-  let selectedTheme = 'system'
+  const validAccents = new Set(['mint', 'violet', 'amber', 'azure'])
+  const validIntensities = new Set(['subtle', 'balanced', 'strong'])
+  const validCards = new Set(DEFAULT_SETTINGS.visibleCards)
+  let settings = {
+    ...DEFAULT_SETTINGS,
+    visibleCards: [...DEFAULT_SETTINGS.visibleCards],
+  }
 
   function resolveTheme(theme) {
     return theme === 'system' ? (systemTheme.matches ? 'dark' : 'light') : theme
   }
 
-  function saveTheme(theme) {
-    try {
-      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
-    } catch (error) {
-      console.warn('DevTab could not save the theme preference.', error)
+  function setStatus(message, state = 'saved') {
+    settingsStatus.textContent = message
+    settingsStatus.dataset.state = state
+  }
+
+  function validateSettings(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return {
+        ...DEFAULT_SETTINGS,
+        visibleCards: [...DEFAULT_SETTINGS.visibleCards],
+      }
+    }
+
+    const visibleCards = Array.isArray(value.visibleCards)
+      ? value.visibleCards.filter(
+          (card, index, cards) => validCards.has(card) && cards.indexOf(card) === index,
+        )
+      : [...DEFAULT_SETTINGS.visibleCards]
+
+    return {
+      theme: validThemes.has(value.theme) ? value.theme : DEFAULT_SETTINGS.theme,
+      accent: validAccents.has(value.accent) ? value.accent : DEFAULT_SETTINGS.accent,
+      backgroundIntensity: validIntensities.has(value.backgroundIntensity)
+        ? value.backgroundIntensity
+        : DEFAULT_SETTINGS.backgroundIntensity,
+      visibleCards,
     }
   }
 
-  function applyTheme(theme, shouldSave = false) {
-    const resolvedTheme = resolveTheme(theme)
-    selectedTheme = theme
+  function loadSettings() {
+    try {
+      const storedSettings = window.localStorage.getItem(SETTINGS_STORAGE_KEY)
+
+      if (storedSettings) {
+        settings = validateSettings(JSON.parse(storedSettings))
+        return 'Preferences loaded.'
+      }
+
+      const legacyTheme = window.localStorage.getItem(LEGACY_THEME_STORAGE_KEY)
+      if (validThemes.has(legacyTheme)) settings.theme = legacyTheme
+      return legacyTheme ? 'Existing theme preference loaded.' : 'Default preferences active.'
+    } catch (error) {
+      console.warn('DevTab could not load dashboard settings.', error)
+      settings = {
+        ...DEFAULT_SETTINGS,
+        visibleCards: [...DEFAULT_SETTINGS.visibleCards],
+      }
+      return 'Preferences could not be loaded. Defaults are active.'
+    }
+  }
+
+  function saveSettings() {
+    try {
+      window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
+      window.localStorage.removeItem(LEGACY_THEME_STORAGE_KEY)
+      setStatus('Settings saved.')
+    } catch (error) {
+      console.warn('DevTab could not save dashboard settings.', error)
+      setStatus('Settings could not be saved. Changes apply for this visit.', 'error')
+    }
+  }
+
+  function checkSelectedInput(inputs, value) {
+    const selectedInput = inputs.find((input) => input.value === value)
+    if (selectedInput) selectedInput.checked = true
+  }
+
+  function applySettings() {
+    const resolvedTheme = resolveTheme(settings.theme)
     root.dataset.theme = resolvedTheme
+    root.dataset.accent = settings.accent
+    root.dataset.backgroundIntensity = settings.backgroundIntensity
     root.style.colorScheme = resolvedTheme
 
-    const selectedInput = themeInputs.find((input) => input.value === theme)
-    if (selectedInput) selectedInput.checked = true
-
-    themeStatus.textContent =
-      theme === 'system'
-        ? `System theme active (${resolvedTheme}).`
-        : `${theme[0].toUpperCase()}${theme.slice(1)} theme active.`
-
-    if (shouldSave) saveTheme(theme)
+    checkSelectedInput(themeInputs, settings.theme)
+    checkSelectedInput(accentInputs, settings.accent)
+    checkSelectedInput(intensityInputs, settings.backgroundIntensity)
+    cardInputs.forEach((input) => {
+      input.checked = settings.visibleCards.includes(input.value)
+    })
+    dashboardCards.forEach((card) => {
+      card.hidden = !settings.visibleCards.includes(card.dataset.dashboardCard)
+    })
   }
 
-  function loadTheme() {
-    try {
-      const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
-      if (validThemes.has(storedTheme)) selectedTheme = storedTheme
-    } catch (error) {
-      console.warn('DevTab could not load the theme preference.', error)
-    }
+  function readSettingsFromControls() {
+    const selectedTheme = themeInputs.find((input) => input.checked)?.value
+    const selectedAccent = accentInputs.find((input) => input.checked)?.value
+    const selectedIntensity = intensityInputs.find((input) => input.checked)?.value
 
-    applyTheme(selectedTheme)
+    return validateSettings({
+      theme: selectedTheme,
+      accent: selectedAccent,
+      backgroundIntensity: selectedIntensity,
+      visibleCards: cardInputs.filter((input) => input.checked).map((input) => input.value),
+    })
+  }
+
+  function updateSettingsFromControls() {
+    settings = readSettingsFromControls()
+    applySettings()
+    saveSettings()
   }
 
   function toggleTheme() {
-    const nextTheme = root.dataset.theme === 'dark' ? 'light' : 'dark'
-    applyTheme(nextTheme, true)
+    settings.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'
+    applySettings()
+    saveSettings()
   }
 
-  themeInputs.forEach((input) => {
-    input.addEventListener('change', () => {
-      if (input.checked && validThemes.has(input.value)) {
-        applyTheme(input.value, true)
-      }
-    })
-  })
+  function showCard(cardName) {
+    if (!validCards.has(cardName) || settings.visibleCards.includes(cardName)) return
+
+    settings.visibleCards = [...settings.visibleCards, cardName]
+    applySettings()
+    saveSettings()
+  }
+
+  settingsForm.addEventListener('change', updateSettingsFromControls)
 
   systemTheme.addEventListener('change', () => {
-    if (selectedTheme === 'system') applyTheme('system')
+    if (settings.theme === 'system') {
+      applySettings()
+      setStatus(`System theme updated to ${root.dataset.theme}.`)
+    }
   })
 
-  loadTheme()
-  return toggleTheme
+  const loadMessage = loadSettings()
+  applySettings()
+  setStatus(loadMessage, loadMessage.startsWith('Preferences could not') ? 'error' : 'saved')
+  return { showCard, toggleTheme }
 }
 
-function setupKeyboardShortcuts(toggleTheme) {
+function setupKeyboardShortcuts(settingsControls) {
   const searchInput = document.querySelector('#web-search')
   const notesInput = document.querySelector('#quick-note')
 
@@ -676,16 +772,17 @@ function setupKeyboardShortcuts(toggleTheme) {
 
     if (event.key.toLowerCase() === 'n') {
       event.preventDefault()
+      settingsControls.showCard('notes')
       notesInput.focus()
       return
     }
 
     if (event.key.toLowerCase() === 't') {
       event.preventDefault()
-      toggleTheme()
+      settingsControls.toggleTheme()
     }
   })
 }
 
-const toggleTheme = setupThemeControl()
-setupKeyboardShortcuts(toggleTheme)
+const settingsControls = setupSettingsControl()
+setupKeyboardShortcuts(settingsControls)
