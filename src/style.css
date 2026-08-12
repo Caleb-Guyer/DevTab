@@ -84,6 +84,10 @@ textarea {
   font: inherit;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 a {
   color: inherit;
 }
@@ -455,6 +459,29 @@ h2 {
   gap: 1rem;
 }
 
+.weather-summary {
+  align-items: flex-start;
+}
+
+.weather-icon {
+  width: 4rem;
+  aspect-ratio: 1;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--accent-line);
+  border-radius: 0.55rem;
+  color: var(--accent);
+  background: var(--accent-muted);
+  font-family: var(--mono);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.weather-details {
+  min-width: 0;
+}
+
 .temperature {
   margin-bottom: 0;
   color: var(--text);
@@ -471,6 +498,71 @@ h2 {
   color: var(--text-soft);
   font-size: 0.9rem;
   font-weight: 700;
+}
+
+.weather-location {
+  margin-bottom: 0;
+  line-height: 1.45;
+}
+
+.weather-retry {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 1rem;
+  border: 1px solid var(--accent-line);
+  border-radius: 0.4rem;
+  padding: 0.65rem 0.9rem;
+  color: var(--accent);
+  background: var(--accent-muted);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition:
+    border-color var(--transition),
+    background-color var(--transition),
+    transform var(--transition);
+}
+
+.weather-retry:hover {
+  border-color: var(--accent);
+  background: rgb(109 246 211 / 17%);
+  transform: translateY(-1px);
+}
+
+.weather-credit {
+  position: relative;
+  z-index: 1;
+  margin: 1.15rem 0 0;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  line-height: 1.5;
+}
+
+.weather-credit a {
+  color: var(--text-soft);
+  text-underline-offset: 0.2em;
+  transition: color var(--transition);
+}
+
+.weather-credit a:hover {
+  color: var(--accent);
+}
+
+.weather-card[data-state="loading"] .weather-icon {
+  animation: weather-signal 1.4s ease-in-out infinite;
+}
+
+@keyframes weather-signal {
+  50% {
+    border-color: var(--accent);
+    box-shadow: 0 0 1.25rem rgb(109 246 211 / 16%);
+    opacity: 0.62;
+  }
 }
 
 .profile-avatar {
@@ -820,6 +912,8 @@ textarea:focus-visible {
   *::before,
   *::after {
     scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

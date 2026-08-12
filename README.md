@@ -20,6 +20,7 @@ browser-native technologies rather than a one-click website builder.
 ## Current features
 
 - A live local clock and date display
+- Live local weather using browser location and real API data
 - Web search and a starter set of developer quick links
 - A scratchpad that automatically saves the note in the browser
 - A responsive custom interface for desktop and mobile screens
@@ -41,6 +42,8 @@ The feature set may evolve as the project is designed and tested.
 - Custom CSS for layout, styling, themes, and responsive behavior
 - Vanilla JavaScript for interactivity and local persistence
 - [Vite](https://vite.dev/) for the development server and production builds
+- [Open-Meteo](https://open-meteo.com/) for current weather data
+- [BigDataCloud](https://www.bigdatacloud.com/) for client-side location names
 
 ## Local development
 

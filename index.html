@@ -56,13 +56,36 @@
               <span class="card-icon" aria-hidden="true">WX</span>
             </header>
 
-            <div class="weather-summary">
-              <p class="temperature">--&deg;</p>
-              <div>
-                <p class="weather-condition">Location not set</p>
-                <p class="muted">Weather details will appear here.</p>
+            <div
+              id="weather-summary"
+              class="weather-summary"
+              role="status"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <span id="weather-icon" class="weather-icon" aria-hidden="true">--</span>
+              <div class="weather-details">
+                <p id="weather-temperature" class="temperature">--</p>
+                <p id="weather-condition" class="weather-condition">Finding your location</p>
+                <p id="weather-location" class="weather-location muted">
+                  Browser permission may be required.
+                </p>
               </div>
             </div>
+
+            <button id="weather-retry" class="weather-retry" type="button" hidden>
+              Try again
+            </button>
+
+            <p class="weather-credit">
+              Weather by
+              <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a>
+              <span aria-hidden="true">/</span>
+              Location by
+              <a href="https://www.bigdatacloud.com/" target="_blank" rel="noreferrer">
+                BigDataCloud
+              </a>
+            </p>
           </section>
 
           <section class="card github-card" aria-labelledby="github-heading">
