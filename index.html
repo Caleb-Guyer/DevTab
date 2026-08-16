@@ -13,8 +13,9 @@
     <div id="app" class="app-shell">
       <header class="site-header">
         <a class="brand" href="./" aria-label="DevTab home">
-          <span class="brand-mark" aria-hidden="true">&gt;_</span>
-          <span>DevTab</span>
+          <span class="brand-mark" aria-hidden="true">//</span>
+          <span class="brand-name">devtab</span>
+          <span class="brand-version" aria-hidden="true">v1.0</span>
         </a>
 
         <time id="clock" class="clock" datetime="" aria-label="Local date and time">
@@ -25,8 +26,8 @@
 
       <main class="dashboard">
         <section class="search-area" aria-labelledby="search-heading">
-          <p class="eyebrow">Your developer workspace</p>
-          <h1 id="search-heading">Where do you want to go?</h1>
+          <p class="eyebrow">Local workspace <span aria-hidden="true">/ ready</span></p>
+          <h1 id="search-heading">Open something.</h1>
 
           <form
             class="search-form"
@@ -39,11 +40,11 @@
               id="web-search"
               name="q"
               type="search"
-              placeholder="Search the web"
+              placeholder="Search the web&hellip;"
               autocomplete="off"
               aria-keyshortcuts="/"
             />
-            <button type="submit">Search</button>
+            <button type="submit">Go <span aria-hidden="true">↗</span></button>
           </form>
 
           <ul class="shortcut-guide" aria-label="Keyboard shortcuts">
@@ -61,10 +62,10 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">Local forecast</p>
+                <p class="card-kicker">01 / local</p>
                 <h2 id="weather-heading">Weather</h2>
               </div>
-              <span class="card-icon" aria-hidden="true">WX</span>
+              <span class="card-icon" aria-hidden="true">WX.01</span>
             </header>
 
             <div
@@ -108,8 +109,8 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">Developer activity</p>
-                <h2 id="github-heading">GitHub</h2>
+                <p class="card-kicker">02 / activity</p>
+                <h2 id="github-heading">GitHub / Caleb</h2>
               </div>
               <a
                 id="github-profile-link"
@@ -164,8 +165,8 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">Bookmarks</p>
-                <h2 id="quick-links-heading">Quick links</h2>
+                <p class="card-kicker">03 / bookmarks</p>
+                <h2 id="quick-links-heading">Jump list</h2>
               </div>
             </header>
 
@@ -204,8 +205,8 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">Scratchpad</p>
-                <h2 id="notes-heading">Notes</h2>
+                <p class="card-kicker">04 / local file</p>
+                <h2 id="notes-heading">Scratch</h2>
               </div>
               <div class="note-actions">
                 <span
@@ -238,10 +239,10 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">Preferences</p>
-                <h2 id="settings-heading">Settings</h2>
+                <p class="card-kicker">05 / preferences</p>
+                <h2 id="settings-heading">Display</h2>
               </div>
-              <span class="card-icon" aria-hidden="true">CFG</span>
+              <span class="card-icon" aria-hidden="true">CFG.05</span>
             </header>
 
             <form id="settings-form" class="settings-form">
