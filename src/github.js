@@ -1,5 +1,6 @@
 import { GITHUB_USERNAME } from './config.js'
 import { readCache, writeCache } from './state.js'
+import { getActiveWorkspace } from './state.js'
 import { formatRelativeTime } from './utilities.js'
 
 const REQUEST_TIMEOUT = 10000
@@ -61,7 +62,7 @@ export function setupGitHub(store) {
   const favoriteFilter = document.querySelector('#favorite-filter')
   const retry = document.querySelector('#github-retry')
   let githubData = null
-  let lastFavorites = JSON.stringify(store.getState().favoriteRepositories)
+  let lastFavorites = JSON.stringify(getActiveWorkspace(store.getState()).favoriteRepositories)
 
   function showMessage(message) {
     const item = document.createElement('li')
@@ -93,7 +94,7 @@ export function setupGitHub(store) {
   function renderRepositories() {
     if (!githubData) return
     const query = filterInput.value.trim().toLowerCase()
-    const favorites = store.getState().favoriteRepositories
+    const favorites = getActiveWorkspace(store.getState()).favoriteRepositories
     const repositories = githubData.repositories
       .filter((repository) => !query || `${repository.name} ${repository.description || ''} ${repository.language || ''}`.toLowerCase().includes(query))
       .filter((repository) => !favoriteFilter.checked || favorites.includes(repository.name))
@@ -131,9 +132,10 @@ export function setupGitHub(store) {
       favorite.setAttribute('aria-label', `${favorites.includes(repository.name) ? 'Remove' : 'Add'} ${repository.name} ${favorites.includes(repository.name) ? 'from' : 'to'} favorites`)
       favorite.addEventListener('click', () => {
         store.update((data) => {
-          data.favoriteRepositories = data.favoriteRepositories.includes(repository.name)
-            ? data.favoriteRepositories.filter((nameItem) => nameItem !== repository.name)
-            : [...data.favoriteRepositories, repository.name]
+          const workspace = getActiveWorkspace(data)
+          workspace.favoriteRepositories = workspace.favoriteRepositories.includes(repository.name)
+            ? workspace.favoriteRepositories.filter((nameItem) => nameItem !== repository.name)
+            : [...workspace.favoriteRepositories, repository.name]
           return data
         }, { source: 'github-favorite' })
       })
@@ -246,7 +248,7 @@ export function setupGitHub(store) {
   favoriteFilter.addEventListener('change', renderRepositories)
   retry.addEventListener('click', load)
   store.subscribe((state) => {
-    const favorites = JSON.stringify(state.favoriteRepositories)
+    const favorites = JSON.stringify(getActiveWorkspace(state).favoriteRepositories)
     if (favorites !== lastFavorites) {
       lastFavorites = favorites
       renderRepositories()

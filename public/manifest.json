@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "DevTab",
-  "description": "A keyboard-first developer dashboard for every new tab.",
-  "version": "2.0.0",
+  "description": "A keyboard-first project workspace that restores your development context.",
+  "version": "3.0.0",
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
@@ -11,7 +11,7 @@
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "permissions": ["geolocation"],
+  "permissions": ["geolocation", "tabs"],
   "host_permissions": [
     "https://api.open-meteo.com/*",
     "https://geocoding-api.open-meteo.com/*",

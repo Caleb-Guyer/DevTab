@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devtab-shell-v2'
+const CACHE_NAME = 'devtab-shell-v3'
 const scope = new URL(self.registration.scope)
 const shell = [scope.pathname, `${scope.pathname}index.html`, `${scope.pathname}manifest.webmanifest`]
 

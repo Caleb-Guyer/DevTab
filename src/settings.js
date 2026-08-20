@@ -1,4 +1,5 @@
-import { DEFAULT_SETTINGS, createDefaultData } from './config.js'
+import { ACCENT_IDS, DEFAULT_SETTINGS, DEFAULT_WORKSPACE_LAYOUT, createDefaultData } from './config.js'
+import { getActiveWorkspace } from './state.js'
 
 export function setupSettings(store) {
   const root = document.documentElement
@@ -32,20 +33,22 @@ export function setupSettings(store) {
     if (input) input.checked = true
   }
 
-  function apply(settings) {
+  function apply(state) {
+    const settings = state.settings
+    const workspace = getActiveWorkspace(state)
     const resolvedTheme = resolveTheme(settings.theme)
     root.dataset.theme = resolvedTheme
-    root.dataset.accent = settings.accent
+    root.dataset.accent = workspace.accent
     root.dataset.backgroundIntensity = settings.backgroundIntensity
     root.dataset.contrast = settings.contrast
     root.dataset.motion = resolveMotion(settings.motion)
     root.style.colorScheme = resolvedTheme
 
     checkValue('theme', settings.theme)
-    checkValue('accent', settings.accent)
+    checkValue('accent', workspace.accent)
     checkValue('background-intensity', settings.backgroundIntensity)
     form.querySelectorAll('[name="visible-card"]').forEach((input) => {
-      input.checked = settings.visibleCards.includes(input.value)
+      input.checked = workspace.visibleCards.includes(input.value)
     })
     searchEngine.value = settings.searchEngine
     contrast.value = settings.contrast
@@ -55,11 +58,12 @@ export function setupSettings(store) {
   function saveFromControls() {
     const persisted = store.update(
       (data) => {
+        const workspace = getActiveWorkspace(data)
         data.settings.theme = form.querySelector('[name="theme"]:checked')?.value || 'system'
-        data.settings.accent = form.querySelector('[name="accent"]:checked')?.value || 'mint'
+        workspace.accent = form.querySelector('[name="accent"]:checked')?.value || 'mint'
         data.settings.backgroundIntensity =
           form.querySelector('[name="background-intensity"]:checked')?.value || 'balanced'
-        data.settings.visibleCards = [...form.querySelectorAll('[name="visible-card"]:checked')].map(
+        workspace.visibleCards = [...form.querySelectorAll('[name="visible-card"]:checked')].map(
           (input) => input.value,
         )
         data.settings.searchEngine = searchEngine.value
@@ -106,9 +110,14 @@ export function setupSettings(store) {
   function resetSetting(setting) {
     store.update(
       (data) => {
+        const workspace = getActiveWorkspace(data)
         if (setting === 'accessibility') {
           data.settings.contrast = DEFAULT_SETTINGS.contrast
           data.settings.motion = DEFAULT_SETTINGS.motion
+        } else if (setting === 'accent') {
+          workspace.accent = 'mint'
+        } else if (setting === 'visibleCards') {
+          workspace.visibleCards = [...DEFAULT_WORKSPACE_LAYOUT.visibleCards]
         } else {
           data.settings[setting] = structuredClone(DEFAULT_SETTINGS[setting])
         }
@@ -135,17 +144,17 @@ export function setupSettings(store) {
     setStatus('DevTab was reset to its defaults.')
   })
 
-  systemTheme.addEventListener('change', () => apply(store.getState().settings))
-  systemMotion.addEventListener('change', () => apply(store.getState().settings))
-  store.subscribe((state) => apply(state.settings))
-  apply(store.getState().settings)
+  systemTheme.addEventListener('change', () => apply(store.getState()))
+  systemMotion.addEventListener('change', () => apply(store.getState()))
+  store.subscribe((state) => apply(state))
+  apply(store.getState())
   setStatus(store.getStorageError() ? 'Storage is unavailable; changes are temporary.' : 'Preferences loaded.', store.getStorageError() ? 'error' : 'saved')
 
   return {
     showCard(cardId) {
-      if (store.getState().settings.visibleCards.includes(cardId)) return
+      if (getActiveWorkspace(store.getState()).visibleCards.includes(cardId)) return
       store.update((data) => {
-        data.settings.visibleCards.push(cardId)
+        getActiveWorkspace(data).visibleCards.push(cardId)
         return data
       })
     },
@@ -159,11 +168,11 @@ export function setupSettings(store) {
     setAppearance(value) {
       const normalized = value.toLowerCase()
       const themes = ['system', 'light', 'dark']
-      const accents = ['mint', 'violet', 'amber', 'azure']
+      const accents = ACCENT_IDS
       if (![...themes, ...accents].includes(normalized)) return false
       store.update((data) => {
         if (themes.includes(normalized)) data.settings.theme = normalized
-        if (accents.includes(normalized)) data.settings.accent = normalized
+        if (accents.includes(normalized)) getActiveWorkspace(data).accent = normalized
         return data
       })
       return true

@@ -1,4 +1,5 @@
 import { CARD_IDS } from './config.js'
+import { getActiveWorkspace } from './state.js'
 
 export function setupCards(store) {
   const grid = document.querySelector('#dashboard-grid')
@@ -6,24 +7,25 @@ export function setupCards(store) {
   let draggedCard = null
   let dragAllowed = false
 
-  function apply(settings) {
+  function apply(workspace) {
     cards.forEach((card) => {
       const cardId = card.dataset.dashboardCard
-      card.hidden = !settings.visibleCards.includes(cardId)
-      card.style.order = settings.cardOrder.indexOf(cardId)
+      card.hidden = !workspace.visibleCards.includes(cardId)
+      card.style.order = workspace.cardOrder.indexOf(cardId)
     })
   }
 
   function moveCard(cardId, direction) {
     store.update(
       (data) => {
-        const order = [...data.settings.cardOrder]
+        const workspace = getActiveWorkspace(data)
+        const order = [...workspace.cardOrder]
         const index = order.indexOf(cardId)
         const nextIndex = Math.max(0, Math.min(order.length - 1, index + direction))
         if (index === nextIndex) return data
         order.splice(index, 1)
         order.splice(nextIndex, 0, cardId)
-        data.settings.cardOrder = order
+        workspace.cardOrder = order
         return data
       },
       { source: 'cards' },
@@ -81,12 +83,13 @@ export function setupCards(store) {
       }
       store.update(
         (data) => {
-          const order = [...data.settings.cardOrder]
+          const workspace = getActiveWorkspace(data)
+          const order = [...workspace.cardOrder]
           const sourceIndex = order.indexOf(sourceId)
           const targetIndex = order.indexOf(targetId)
           order.splice(sourceIndex, 1)
           order.splice(targetIndex, 0, sourceId)
-          data.settings.cardOrder = order
+          workspace.cardOrder = order
           return data
         },
         { source: 'cards' },
@@ -98,6 +101,6 @@ export function setupCards(store) {
     if (!draggedCard) dragAllowed = false
   })
 
-  store.subscribe((state) => apply(state.settings))
-  apply(store.getState().settings)
+  store.subscribe((state) => apply(getActiveWorkspace(state)))
+  apply(getActiveWorkspace(store.getState()))
 }

@@ -4,8 +4,9 @@ import {
   parseCommandInput,
   scoreMatch,
 } from './utilities.js'
+import { getActiveWorkspace } from './state.js'
 
-export function setupLauncher({ store, links, notes, settings }) {
+export function setupLauncher({ store, links, notes, settings, workspaces, tasks, sessions, focus }) {
   const dialog = document.querySelector('#command-dialog')
   const trigger = document.querySelector('#command-trigger')
   const closeButton = document.querySelector('#command-close')
@@ -26,6 +27,46 @@ export function setupLauncher({ store, links, notes, settings }) {
 
   function staticActions() {
     return [
+      {
+        label: 'Switch workspace',
+        detail: 'workspace <name>',
+        keywords: 'project context change workspace',
+        run: () => {
+          input.value = 'workspace '
+          input.focus()
+          render()
+        },
+      },
+      {
+        label: 'Launch workspace tabs',
+        detail: 'launch <name>',
+        keywords: 'restore tabs browser session project',
+        run: () => {
+          input.value = 'launch '
+          input.focus()
+          render()
+        },
+      },
+      {
+        label: 'Add a project task',
+        detail: 'task <text>',
+        keywords: 'todo project queue add',
+        run: () => {
+          input.value = 'task '
+          input.focus()
+          render()
+        },
+      },
+      {
+        label: 'Start a focus block',
+        detail: 'focus 25',
+        keywords: 'timer pomodoro concentrate work',
+        run: () => {
+          input.value = 'focus 25'
+          input.focus()
+          render()
+        },
+      },
       {
         label: 'Search GitHub',
         detail: 'gh <query>',
@@ -75,7 +116,16 @@ export function setupLauncher({ store, links, notes, settings }) {
           close()
         },
       },
-      ...store.getState().links.map((link) => ({
+      ...store.getState().workspaces.map((workspace) => ({
+        label: `Switch to ${workspace.name}`,
+        detail: `workspace ${workspace.command}`,
+        keywords: `project context ${workspace.name} ${workspace.repository}`,
+        run: () => {
+          workspaces.switchTo(workspace.id)
+          close()
+        },
+      })),
+      ...getActiveWorkspace(store.getState()).links.map((link) => ({
         label: `Open ${link.label}`,
         detail: link.url,
         keywords: `open ${link.label} ${link.url}`,
@@ -87,6 +137,70 @@ export function setupLauncher({ store, links, notes, settings }) {
   function dynamicAction(value) {
     const { name, args } = parseCommandInput(value)
     if (!name || !args) return null
+
+    if (name === 'workspace') {
+      return {
+        label: `Switch to workspace “${args}”`,
+        detail: 'change the active project context',
+        run: () => {
+          if (workspaces.switchByName(args)) close()
+          else feedback.textContent = `No workspace matches “${args}”.`
+        },
+      }
+    }
+    if (name === 'launch') {
+      return {
+        label: `Launch workspace “${args}”`,
+        detail: 'switch context and restore its saved tabs',
+        run: async () => {
+          if (!workspaces.switchByName(args)) {
+            feedback.textContent = `No workspace matches “${args}”.`
+            return
+          }
+          close()
+          await sessions.restore()
+        },
+      }
+    }
+    if (name === 'task') {
+      return {
+        label: `Add task “${args}”`,
+        detail: `save to ${getActiveWorkspace(store.getState()).name}`,
+        run: () => {
+          tasks.add(args)
+          feedback.textContent = 'Task added to this workspace.'
+          window.setTimeout(close, 350)
+        },
+      }
+    }
+    if (name === 'done') {
+      return {
+        label: `Complete task “${args}”`,
+        detail: 'match an open workspace task',
+        run: () => {
+          if (tasks.completeByName(args)) close()
+          else feedback.textContent = `No open task matches “${args}”.`
+        },
+      }
+    }
+    if (name === 'focus') {
+      const minutes = Number(args)
+      const isDuration = Number.isInteger(minutes) && minutes >= 5 && minutes <= 120
+      const action = args.toLowerCase()
+      return {
+        label: isDuration ? `Start a ${minutes}-minute focus block` : `${action} focus timer`,
+        detail: isDuration ? '5–120 minutes' : 'start, pause, or reset',
+        disabled: !isDuration && !['start', 'pause', 'reset'].includes(action),
+        run: () => {
+          if (isDuration) {
+            focus.setDuration(minutes)
+            focus.toggle()
+          } else if (action === 'reset') focus.reset()
+          else focus.toggle()
+          close()
+        },
+      }
+    }
 
     if (name === 'gh') {
       return { label: `Search GitHub for “${args}”`, detail: 'github.com/search', run: () => navigate(buildSearchDestination(args, 'github')) }

@@ -1,5 +1,6 @@
 import { parseMarkdownLines, toggleChecklistLine } from './markdown.js'
 import { createDefaultNote } from './config.js'
+import { getActiveWorkspace } from './state.js'
 import { createId, formatRelativeTime } from './utilities.js'
 
 const SAVE_DELAY = 250
@@ -19,8 +20,10 @@ export function setupNotes(store) {
   let saveTimer
 
   function activeNote() {
-    const state = store.getState()
-    return state.notes.find((note) => note.id === state.activeNoteId) || state.notes[0]
+    const workspace = getActiveWorkspace(store.getState())
+    return (
+      workspace.notes.find((note) => note.id === workspace.activeNoteId) || workspace.notes[0]
+    )
   }
 
   function setStatus(message, state = 'saved') {
@@ -31,7 +34,8 @@ export function setupNotes(store) {
   function setActive(noteId) {
     store.update(
       (data) => {
-        if (data.notes.some((note) => note.id === noteId)) data.activeNoteId = noteId
+        const workspace = getActiveWorkspace(data)
+        if (workspace.notes.some((note) => note.id === noteId)) workspace.activeNoteId = noteId
         return data
       },
       { source: 'notes', action: 'select' },
@@ -40,7 +44,8 @@ export function setupNotes(store) {
 
   function renderList() {
     const query = searchInput.value.trim().toLowerCase()
-    const notes = [...store.getState().notes]
+    const workspace = getActiveWorkspace(store.getState())
+    const notes = [...workspace.notes]
       .filter(
         (note) =>
           !query || `${note.title} ${note.content}`.toLowerCase().includes(query),
@@ -62,7 +67,7 @@ export function setupNotes(store) {
       const detail = document.createElement('span')
       button.type = 'button'
       button.className = 'note-list-button'
-      button.dataset.active = String(note.id === store.getState().activeNoteId)
+      button.dataset.active = String(note.id === workspace.activeNoteId)
       button.addEventListener('click', () => setActive(note.id))
       title.className = 'note-list-title'
       title.textContent = `${note.pinned ? '◆ ' : ''}${note.title}`
@@ -140,18 +145,23 @@ export function setupNotes(store) {
 
   function updateActive(changes, immediate = false) {
     window.clearTimeout(saveTimer)
+    const sourceWorkspace = getActiveWorkspace(store.getState())
+    const workspaceId = sourceWorkspace.id
+    const noteId = sourceWorkspace.activeNoteId
     const save = () => {
       saveTimer = undefined
       const now = new Date().toISOString()
       const persisted = store.update(
         (data) => {
-          const note = data.notes.find((item) => item.id === data.activeNoteId)
+          const workspace = data.workspaces.find((item) => item.id === workspaceId)
+          const note = workspace?.notes.find((item) => item.id === noteId)
           if (!note) return data
           Object.assign(note, changes, { updatedAt: now })
           return data
         },
         { source: 'notes', action: 'save' },
       )
+      if (getActiveWorkspace(store.getState()).id !== workspaceId) return
       setStatus(persisted ? 'Saved' : 'Not saved', persisted ? 'saved' : 'error')
       renderList()
       renderPreview()
@@ -172,8 +182,9 @@ export function setupNotes(store) {
     note.pinned = false
     store.update(
       (data) => {
-        data.notes.push(note)
-        data.activeNoteId = note.id
+        const workspace = getActiveWorkspace(data)
+        workspace.notes.push(note)
+        workspace.activeNoteId = note.id
         return data
       },
       { source: 'notes', action: 'create' },
@@ -204,9 +215,10 @@ export function setupNotes(store) {
     if (!window.confirm(`Delete “${note.title}”?`)) return
     store.update(
       (data) => {
-        data.notes = data.notes.filter((item) => item.id !== note.id)
-        if (data.notes.length === 0) data.notes.push(createDefaultNote())
-        data.activeNoteId = data.notes[0].id
+        const workspace = getActiveWorkspace(data)
+        workspace.notes = workspace.notes.filter((item) => item.id !== note.id)
+        if (workspace.notes.length === 0) workspace.notes.push(createDefaultNote())
+        workspace.activeNoteId = workspace.notes[0].id
         return data
       },
       { source: 'notes', action: 'delete' },
@@ -230,14 +242,15 @@ export function setupNotes(store) {
     },
     createNote,
     append(text) {
-      const state = store.getState()
-      const target = state.notes.find((note) => note.pinned) || activeNote()
+      const workspace = getActiveWorkspace(store.getState())
+      const target = workspace.notes.find((note) => note.pinned) || activeNote()
       store.update(
         (data) => {
-          const note = data.notes.find((item) => item.id === target.id)
+          const activeWorkspace = getActiveWorkspace(data)
+          const note = activeWorkspace.notes.find((item) => item.id === target.id)
           note.content = `${note.content}${note.content ? '\n' : ''}${text}`
           note.updatedAt = new Date().toISOString()
-          data.activeNoteId = note.id
+          activeWorkspace.activeNoteId = note.id
           return data
         },
         { source: 'notes', action: 'append' },

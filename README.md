@@ -1,84 +1,96 @@
 # DevTab
 
-DevTab is a keyboard-first, developer-focused new-tab dashboard built for
-[Hack Club Stardance](https://stardance.hackclub.com/). It combines search,
-commands, live information, bookmarks, and local Markdown notes in one fast,
-customizable workspace.
+DevTab is a keyboard-first project workspace for the browser's new-tab page. It keeps the context for each project—tasks, notes, links, repository activity, focus sessions, and saved browser tabs—together in a fast local-first dashboard.
 
 **Live site:** [caleb-guyer.github.io/DevTab](https://caleb-guyer.github.io/DevTab/)
 
-![DevTab feature demo](./public/demo.gif)
+![DevTab project workspace demo](./public/demo.gif)
 
-## Features
+## DevTab 3.0: Project Workspaces
 
-### Search and command launcher
+Create a workspace for every project and switch context without rebuilding your dashboard. Each workspace has its own:
 
-- Search with Google, DuckDuckGo, GitHub, or MDN
-- Open pasted URLs directly
-- Open the command launcher with `Ctrl/Cmd + K` or by typing `>`
-- Search GitHub or MDN, open saved links, append notes, change appearance, and
-  calculate arithmetic from commands
+- Name, command alias, identifying mark, purpose, and accent color
+- Public GitHub repository connection
+- Project queue and completion progress
+- Focus timer, linked task, and completed-session count
+- Saved browser-tab session
+- Markdown notes, quick links, repository favorites, card layout, and visibility settings
 
-| Command | Example |
-| --- | --- |
-| `gh <query>` | `gh DevTab` |
-| `mdn <query>` | `mdn grid` |
-| `open <link>` | `open Vite` |
-| `note <text>` | `note finish extension docs` |
-| `theme <value>` | `theme amber` |
-| `calc <expression>` | `calc (48 * 12) / 3` |
+Existing DevTab 2.0 data is migrated automatically into the first workspace.
 
-### Custom dashboard
+### Pick up where you left off
 
+The browser extension can capture the web tabs in the current window and restore them later. This makes one workspace a complete launch point for a project: repository, localhost, documentation, designs, and other tools.
+
+The deployed website provides a manual URL list and can restore those pages when pop-ups are allowed. Window-wide capture is available only in the extension because regular websites cannot read the browser's tabs.
+
+### Project context
+
+Connect any public GitHub repository using `owner/repository` or its GitHub URL. DevTab shows:
+
+- Repository language, update time, and star count
+- Open issue and pull-request counts
+- Recent commits
+- Latest published release
+- A cached snapshot when the network is unavailable
+
+Requests use the public GitHub REST API without a personal access token.
+
+### Tasks and focus
+
+- Add, complete, filter, and clear project tasks
+- See task progress in both the queue and workspace overview
+- Run 15, 25, or 50-minute focus blocks, or choose a custom duration from a command
+- Link a focus block to an open task
+- Pause and resume timers across page reloads and workspace switches
+- Track completed focus blocks per workspace
+
+## Search and command launcher
+
+Search with Google, DuckDuckGo, GitHub, or MDN, paste a URL, or open the command launcher with `Ctrl/Cmd + K`.
+
+| Command | Example | Action |
+| --- | --- | --- |
+| `workspace <name>` | `workspace devtab` | Switch project context |
+| `launch <name>` | `launch portfolio` | Switch and restore saved tabs |
+| `task <text>` | `task test mobile layout` | Add a workspace task |
+| `done <task>` | `done mobile layout` | Complete a matching task |
+| `focus <minutes>` | `focus 25` | Start a 5–120 minute focus block |
+| `focus <action>` | `focus reset` | Start, pause, or reset the timer |
+| `gh <query>` | `gh DevTab` | Search GitHub |
+| `mdn <query>` | `mdn grid` | Search MDN |
+| `open <link>` | `open Vite` | Open a saved quick link |
+| `note <text>` | `note document the release` | Append to a pinned note |
+| `theme <value>` | `theme amber` | Change mode or workspace accent |
+| `calc <expression>` | `calc (48 * 12) / 3` | Calculate and copy a result |
+
+## Other dashboard features
+
+### Notes and links
+
+- Create, search, pin, delete, and download multiple Markdown notes
+- Preview headings, bullets, code blocks, and interactive checklists
+- Automatically save notes in the active workspace
 - Add, edit, delete, and reorder quick links
-- Reorder dashboard cards by dragging their handles or using `Alt + Arrow`
-- Show or hide individual cards
-- Choose the accent color, background intensity, search engine, and dark,
-  light, or system mode
-- Select standard or high contrast and full, reduced, or system motion
-- Export the complete dashboard as JSON and import it on another device
-- Reset one preference group without resetting the rest of DevTab
 
-### Weather
+### GitHub profile and weather
 
-- Use browser geolocation or enter a city manually
-- Select automatic, Fahrenheit, or Celsius units
-- View live temperature, condition, location, and weather symbol
-- Fall back to the last successful result when the network is unavailable
+- View Caleb's public profile, repositories, favorites, and recent activity
+- Use device geolocation or search for a weather location manually
+- Choose automatic, Fahrenheit, or Celsius units
+- Continue showing cached GitHub and weather data when offline
 
-Weather and city search are provided by
-[Open-Meteo](https://open-meteo.com/). Automatic location names use
-[BigDataCloud](https://www.bigdatacloud.com/).
+Weather and city search are provided by [Open-Meteo](https://open-meteo.com/). Automatic location names use [BigDataCloud](https://www.bigdatacloud.com/).
 
-### GitHub
+### Customization and portability
 
-- View public profile, repository, follower, and open-item counts
-- Browse recently updated repositories with language, stars, open issues, and
-  update time
-- Filter repositories and save local favorites
-- View recent public GitHub events
-- Open common GitHub actions quickly
-- Continue showing the last successful response during API or network failures
-
-GitHub data comes from the public
-[GitHub REST API](https://docs.github.com/en/rest) without an access token.
-
-### Notes
-
-- Create and search multiple named notes
-- Automatically save notes in the browser
-- Pin important notes
-- Preview headings, bullets, code blocks, and interactive Markdown checklists
-- View created and updated timestamps
-- Download any note as a Markdown file
-
-### Offline and extension support
-
-- Cache the application shell with a service worker
-- Cache the last successful weather and GitHub responses
-- Install DevTab as a browser app from supported browsers
-- Build an unpacked Manifest V3 extension that replaces the browser's new-tab
-  page
+- Reorder cards by dragging their handles or using `Alt + Arrow`
+- Show or hide cards independently in every workspace
+- Choose a workspace accent and global dark, light, or system mode
+- Adjust background intensity, contrast, motion, and search provider
+- Duplicate a workspace as a reusable project template
+- Export or import the complete versioned dashboard as JSON
 
 ## Keyboard shortcuts
 
@@ -88,20 +100,22 @@ GitHub data comes from the public
 | `N` | Show and focus notes |
 | `T` | Toggle dark or light mode |
 | `Ctrl/Cmd + K` | Open the command launcher |
-| `Alt + Arrow` | Move a dashboard card while its move control is focused |
+| `Ctrl/Cmd + 1–9` | Switch to a workspace by position |
+| `Alt + Arrow` | Move a dashboard card while its handle is focused |
 
 Single-key shortcuts do not run while typing in an input, text area, or select.
 
 ## Technologies
 
 - Semantic HTML5
-- Custom CSS with responsive layouts and accessible appearance modes
+- Custom responsive CSS
 - Vanilla JavaScript modules
-- Browser `localStorage`, Cache API, and Service Worker API
+- Browser `localStorage`, Cache API, Service Worker API, and extension Tabs API
 - [Vite](https://vite.dev/) for development and builds
+- Manifest V3 browser extension
 - Node's built-in test runner
-- Lighthouse CI for automated performance and accessibility thresholds
-- GitHub Actions and GitHub Pages for continuous deployment
+- Lighthouse CI
+- GitHub Actions and GitHub Pages
 
 ## Local development
 
@@ -121,52 +135,51 @@ npm run dev
 
 Open the address printed in the terminal, normally `http://localhost:5173`.
 
-On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd` in place of
-`npm`.
+On Windows PowerShell systems that block `npm.ps1`, use `npm.cmd` in place of `npm`.
 
 ### Available commands
 
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Start the development server |
-| `npm test` | Run state, command, URL, calculator, and Markdown tests |
+| `npm test` | Run state migration, validation, command, URL, calculator, and Markdown tests |
 | `npm run build` | Create the production website in `dist/` |
-| `npm run build:extension` | Create the unpacked browser extension in `dist-extension/` |
+| `npm run build:extension` | Create the unpacked extension in `dist-extension/` |
 | `npm run preview` | Preview the production website locally |
 | `npm run audit` | Run Lighthouse CI checks |
 | `npm run check` | Run tests and the production build |
-| `npm run assets` | Regenerate icons, social preview, and demo media |
+| `npm run assets` | Regenerate icons, the social preview, and demo media |
 
 ## Install as a browser extension
 
 1. Run `npm install` and `npm run build:extension`.
 2. Open the browser's extension management page.
 3. Enable developer mode.
-4. Choose **Load unpacked** and select the generated `dist-extension` folder.
-5. Open a new tab.
+4. Choose **Load unpacked** and select `dist-extension`.
+5. Open a new tab and create or select a workspace.
+6. Use **Capture window** in the Saved tab session card when you want to save the current web tabs.
 
-Chrome and Edge use `chrome://extensions`. Firefox users can temporarily load
-the generated `manifest.json` from `about:debugging`.
+Chrome and Edge use `chrome://extensions`. Firefox can temporarily load the generated `manifest.json` from `about:debugging`.
 
-The extension requests geolocation only for automatic weather. Its API host
-permissions are limited to Open-Meteo, BigDataCloud, and GitHub.
+The extension requests:
+
+- `geolocation` for automatic weather
+- `tabs` to capture titles and URLs from the current browser window and restore them
+- Host access limited to the public weather, reverse-geocoding, and GitHub APIs used by the dashboard
 
 ## Data and privacy
 
-- Notes, links, favorites, and preferences remain in browser storage.
-- Exported backups are created locally and downloaded by the browser.
-- Location is requested only for automatic weather and can be replaced with a
-  manually selected city.
-- GitHub uses only public information and does not require authentication.
+- Workspaces, tasks, notes, links, settings, focus history, and saved tab URLs remain in browser storage.
+- Captured tab sessions are never sent to a server by DevTab.
+- Exported backups are assembled locally and downloaded by the browser.
+- Precise location is requested only when automatic weather is selected.
+- GitHub integrations read only public information and require no authentication.
 - No analytics or tracking scripts are included.
 
 ## Quality checks and deployment
 
-The quality workflow runs automated tests, website and extension builds, and
-Lighthouse thresholds on pushes and pull requests. Pushes to `main` also deploy
-the production `dist/` directory to GitHub Pages through
-`.github/workflows/deploy-pages.yml`.
+The quality workflow runs automated tests, website and extension builds, and Lighthouse thresholds on pushes and pull requests. Pushes to `main` deploy the production `dist/` directory to GitHub Pages through `.github/workflows/deploy-pages.yml`.
 
 ## Project status
 
-DevTab 2.0 is a complete local-first dashboard and browser new-tab extension.
+DevTab 3.0 is a complete local-first project workspace and new-tab extension. Its central idea is simple: select a project and recover the context needed to continue working.

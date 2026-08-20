@@ -1,4 +1,5 @@
 import { createId, deriveMark, normalizeLinkUrl, scoreMatch } from './utilities.js'
+import { getActiveWorkspace } from './state.js'
 
 export function setupLinks(store) {
   const list = document.querySelector('#quick-links-list')
@@ -40,7 +41,7 @@ export function setupLinks(store) {
   }
 
   function render() {
-    const links = store.getState().links
+    const links = getActiveWorkspace(store.getState()).links
     const items = links.map((link) => {
       const item = document.createElement('li')
       const anchor = document.createElement('a')
@@ -82,11 +83,12 @@ export function setupLinks(store) {
         const sourceId = event.dataTransfer.getData('text/plain')
         if (!sourceId || sourceId === link.id) return
         store.update((data) => {
-          const sourceIndex = data.links.findIndex((itemLink) => itemLink.id === sourceId)
-          const targetIndex = data.links.findIndex((itemLink) => itemLink.id === link.id)
+          const links = getActiveWorkspace(data).links
+          const sourceIndex = links.findIndex((itemLink) => itemLink.id === sourceId)
+          const targetIndex = links.findIndex((itemLink) => itemLink.id === link.id)
           if (sourceIndex < 0 || targetIndex < 0) return data
-          const [moved] = data.links.splice(sourceIndex, 1)
-          data.links.splice(targetIndex, 0, moved)
+          const [moved] = links.splice(sourceIndex, 1)
+          links.splice(targetIndex, 0, moved)
           return data
         })
       })
@@ -99,13 +101,16 @@ export function setupLinks(store) {
   list.addEventListener('click', (event) => {
     const button = event.target.closest('[data-action]')
     if (!button) return
-    const link = store.getState().links.find((item) => item.id === button.dataset.linkId)
+    const link = getActiveWorkspace(store.getState()).links.find(
+      (item) => item.id === button.dataset.linkId,
+    )
     if (!link) return
     if (button.dataset.action === 'edit') openDialog(link)
     if (button.dataset.action === 'delete') {
       if (!window.confirm(`Delete ${link.label} from the jump list?`)) return
       store.update((data) => {
-        data.links = data.links.filter((item) => item.id !== link.id)
+        const workspace = getActiveWorkspace(data)
+        workspace.links = workspace.links.filter((item) => item.id !== link.id)
         return data
       })
     }
@@ -118,11 +123,12 @@ export function setupLinks(store) {
       const url = normalizeLinkUrl(urlInput.value)
       if (!label) throw new Error('Add a label for this link.')
       store.update((data) => {
+        const workspace = getActiveWorkspace(data)
         const id = idInput.value || createId('link')
         const nextLink = { id, label, url, mark: deriveMark(label) }
-        const index = data.links.findIndex((link) => link.id === id)
-        if (index >= 0) data.links[index] = nextLink
-        else data.links.push(nextLink)
+        const index = workspace.links.findIndex((link) => link.id === id)
+        if (index >= 0) workspace.links[index] = nextLink
+        else workspace.links.push(nextLink)
         return data
       })
       closeDialog()
@@ -140,9 +146,8 @@ export function setupLinks(store) {
 
   return {
     openByName(name) {
-      const matches = store
-        .getState()
-        .links.map((link) => ({ link, score: scoreMatch(name, `${link.label} ${link.url}`) }))
+      const matches = getActiveWorkspace(store.getState()).links
+        .map((link) => ({ link, score: scoreMatch(name, `${link.label} ${link.url}`) }))
         .filter(({ score }) => score > 0)
         .sort((a, b) => b.score - a.score)
       if (!matches[0]) return false

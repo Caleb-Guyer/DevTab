@@ -437,6 +437,7 @@ kbd {
 
 .settings-card {
   grid-column: 1 / -1;
+  order: 999;
 }
 
 .card-header {
@@ -1221,7 +1222,803 @@ textarea:focus-visible {
   }
 }
 
-/* DevTab 2.0 controls ---------------------------------------------------- */
+/* DevTab 3.0 project workspaces ----------------------------------------- */
+
+.workspace-switcher {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.workspace-switcher select,
+.workspace-switcher button {
+  min-height: 2rem;
+  border: 0;
+  color: var(--text-soft);
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+
+.workspace-switcher select {
+  width: min(13rem, 22vw);
+  padding: 0 0.55rem;
+}
+
+.workspace-switcher button {
+  border-left: 1px solid var(--border);
+  padding: 0 0.55rem;
+  color: var(--text-muted);
+}
+
+.workspace-switcher button:hover {
+  color: var(--accent);
+  background: var(--accent-muted);
+}
+
+.workspace-description {
+  max-width: 43rem;
+  margin: 0.8rem 0 0;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
+.workspace-description + .search-form {
+  margin-top: 1.35rem;
+}
+
+.project-card {
+  grid-column: span 8;
+}
+
+.focus-card {
+  grid-column: span 4;
+}
+
+.tasks-card,
+.session-card {
+  grid-column: span 6;
+}
+
+.project-identity {
+  min-height: 9.5rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem;
+}
+
+.project-mark {
+  width: 4rem;
+  height: 4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  background:
+    linear-gradient(135deg, var(--accent-muted) 0 49%, transparent 50%),
+    var(--surface-raised);
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+}
+
+.project-copy {
+  min-width: 0;
+}
+
+.project-name {
+  margin: 0 0 0.25rem;
+  color: var(--text);
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+}
+
+.project-copy > .muted {
+  max-width: 35rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.5;
+}
+
+.project-repository {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-decoration: none;
+}
+
+.project-repository:hover {
+  color: var(--accent);
+}
+
+.project-primary-actions {
+  display: grid;
+  justify-items: stretch;
+  gap: 0.55rem;
+}
+
+.project-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.project-stats div {
+  min-width: 0;
+  padding: 0.75rem 0.65rem;
+  text-align: center;
+}
+
+.project-stats div + div {
+  border-left: 1px solid var(--border);
+}
+
+.project-stats dt {
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.48rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-stats dd {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.project-activity {
+  padding: 0.95rem 1rem 1rem;
+}
+
+.project-commit-list,
+.task-list,
+.session-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-commit-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--border);
+}
+
+.project-commit-list > li + li {
+  border-left: 1px solid var(--border);
+}
+
+.project-commit-list a {
+  min-height: 4.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  text-decoration: none;
+}
+
+.project-commit-list a:hover {
+  background: var(--accent-muted);
+}
+
+.project-commit-message {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-soft);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.project-commit-meta,
+.project-empty {
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.52rem;
+}
+
+.project-empty {
+  grid-column: 1 / -1;
+  padding: 1rem;
+}
+
+/* Focus block */
+
+.focus-body {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.focus-time {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: clamp(3rem, 7vw, 4.75rem);
+  font-weight: 750;
+  letter-spacing: -0.1em;
+  line-height: 1;
+}
+
+.focus-progress,
+.task-progress-row progress {
+  width: 100%;
+  height: 0.35rem;
+  border: 0;
+  color: var(--accent);
+  background: var(--surface-raised);
+  accent-color: var(--accent);
+}
+
+progress::-webkit-progress-bar {
+  background: var(--surface-raised);
+}
+
+progress::-webkit-progress-value {
+  background: var(--accent);
+}
+
+progress::-moz-progress-bar {
+  background: var(--accent);
+}
+
+.focus-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0.8rem 0 1rem;
+  border: 1px solid var(--border);
+}
+
+.focus-presets button {
+  min-height: 2rem;
+  border: 0;
+  color: var(--text-muted);
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+
+.focus-presets button + button {
+  border-left: 1px solid var(--border);
+}
+
+.focus-presets button:hover,
+.focus-presets button[data-active="true"] {
+  color: var(--accent);
+  background: var(--accent-muted);
+}
+
+#focus-task,
+.compact-select,
+.task-form input,
+.session-form input,
+.workspace-dialog input,
+.workspace-dialog textarea,
+.workspace-dialog select {
+  min-width: 0;
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+}
+
+#focus-task {
+  width: 100%;
+  min-height: 2.4rem;
+  margin-bottom: 0.85rem;
+  padding: 0 0.6rem;
+}
+
+.focus-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.focus-sessions {
+  margin: 1rem 0 0.3rem;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+}
+
+.focus-status {
+  min-height: 2.4em;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+/* Task queue */
+
+.compact-select {
+  max-width: 7.5rem;
+  min-height: 1.75rem;
+  padding: 0 0.4rem;
+}
+
+.task-form,
+.session-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.task-form input,
+.session-form input {
+  min-height: 2.65rem;
+  padding: 0 0.75rem;
+}
+
+.task-form button,
+.session-form button {
+  border: 1px solid var(--border-strong);
+  border-left: 0;
+  padding: 0 0.85rem;
+  color: var(--accent-contrast);
+  background: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.task-progress-row {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.55rem;
+}
+
+.task-list {
+  max-height: 20rem;
+  overflow: auto;
+}
+
+.task-item {
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.task-item label {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.task-item input {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  accent-color: var(--accent);
+}
+
+.task-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.task-title {
+  overflow: hidden;
+  color: var(--text-soft);
+  font-size: 0.74rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-meta {
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.5rem;
+}
+
+.task-item[data-completed="true"] .task-title {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.task-remove,
+.session-remove {
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+  border: 0;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.task-remove:hover,
+.session-remove:hover {
+  color: var(--danger);
+}
+
+.task-empty,
+.session-empty {
+  padding: 1.2rem 1rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+}
+
+.task-footer {
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  font-family: var(--mono);
+  font-size: 0.52rem;
+}
+
+.task-footer code {
+  color: var(--accent);
+}
+
+/* Saved browser session */
+
+.session-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.session-mode {
+  margin-bottom: 0.25rem;
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+}
+
+.session-status {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.66rem;
+}
+
+.session-status[data-state="error"] {
+  color: var(--danger);
+}
+
+.session-status[data-state="loading"],
+.session-status[data-state="info"] {
+  color: var(--accent);
+}
+
+.session-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.session-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-height: 17rem;
+  overflow: auto;
+}
+
+.session-list li {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.session-list li:nth-child(even) {
+  border-left: 1px solid var(--border);
+}
+
+.session-list a {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  text-decoration: none;
+}
+
+.session-list a:hover {
+  background: var(--accent-muted);
+}
+
+.session-index {
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.52rem;
+}
+
+.session-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.session-title,
+.session-host {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-title {
+  color: var(--text-soft);
+  font-size: 0.68rem;
+}
+
+.session-host {
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.5rem;
+}
+
+/* Workspace editor */
+
+.workspace-dialog {
+  width: min(calc(100% - 2rem), 44rem);
+}
+
+.workspace-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(5rem, 0.7fr) minmax(7rem, 1fr);
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.workspace-form-grid label {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 0.4rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.56rem;
+}
+
+.workspace-field-wide {
+  grid-column: 1 / -1;
+}
+
+.workspace-dialog input,
+.workspace-dialog textarea,
+.workspace-dialog select {
+  width: 100%;
+  min-height: 2.55rem;
+  padding: 0.6rem 0.7rem;
+  resize: vertical;
+}
+
+.input-prefix {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.input-prefix > span {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-right: 0;
+  padding: 0 0.55rem;
+  color: var(--accent);
+  background: var(--surface-raised);
+}
+
+.workspace-error {
+  margin: 0 1rem 0.75rem;
+}
+
+.workspace-dialog-actions,
+.workspace-dialog-actions > div {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.workspace-dialog-actions {
+  justify-content: space-between;
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 60rem) {
+  .project-card,
+  .tasks-card,
+  .session-card {
+    grid-column: span 8;
+  }
+
+  .focus-card {
+    grid-column: span 4;
+  }
+
+  .project-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .project-stats div:nth-child(4) {
+    border-left: 0;
+  }
+
+  .project-stats div:nth-child(n + 4) {
+    border-top: 1px solid var(--border);
+  }
+
+  .tasks-card,
+  .session-card {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 48rem) {
+  .workspace-switcher select {
+    width: 9.5rem;
+  }
+
+  .workspace-switcher button {
+    display: none;
+  }
+
+  .project-card,
+  .focus-card,
+  .tasks-card,
+  .session-card {
+    grid-column: 1 / -1;
+  }
+
+  .project-commit-list {
+    grid-template-columns: 1fr;
+  }
+
+  .project-commit-list > li + li {
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+
+  .workspace-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 42rem) {
+  .workspace-switcher select {
+    width: 7.5rem;
+  }
+
+  .project-identity {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .project-primary-actions {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr auto;
+  }
+
+  .session-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .session-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .session-list {
+    grid-template-columns: 1fr;
+  }
+
+  .session-list li:nth-child(even) {
+    border-left: 0;
+  }
+}
+
+@media (max-width: 34rem) {
+  .workspace-switcher {
+    display: none;
+  }
+
+  .project-identity {
+    grid-template-columns: 1fr;
+  }
+
+  .project-mark {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  .project-primary-actions {
+    grid-column: auto;
+  }
+
+  .project-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .project-stats div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .project-stats div:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
+  .task-form,
+  .session-form,
+  .task-progress-row {
+    grid-template-columns: 1fr;
+  }
+
+  .task-form button,
+  .session-form button {
+    min-height: 2.5rem;
+    border-top: 0;
+    border-left: 1px solid var(--border-strong);
+  }
+
+  .task-footer,
+  .workspace-dialog-actions,
+  .workspace-dialog-actions > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .workspace-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-field-wide {
+    grid-column: auto;
+  }
+}
+
+/* Dashboard controls ---------------------------------------------------- */
 
 .header-tools,
 .card-header-actions,

@@ -1,7 +1,7 @@
 {
   "name": "DevTab",
   "short_name": "DevTab",
-  "description": "A keyboard-first developer dashboard.",
+  "description": "A keyboard-first project workspace for tasks, notes, repositories, focus, and saved tabs.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

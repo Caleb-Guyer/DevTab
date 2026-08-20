@@ -6,12 +6,12 @@
     <meta name="theme-color" content="#11110f" />
     <meta
       name="description"
-      content="DevTab is a keyboard-first, customizable developer new-tab dashboard."
+      content="DevTab is a keyboard-first project workspace that restores your notes, tasks, repository context, focus timer, and browser session."
     />
-    <meta property="og:title" content="DevTab — a keyboard-first developer dashboard" />
+    <meta property="og:title" content="DevTab — pick up exactly where you left off" />
     <meta
       property="og:description"
-      content="Search, launch commands, check GitHub and weather, and keep local Markdown notes from one fast new tab."
+      content="Switch projects, restore saved tabs, track tasks, focus, and keep repository context in one local-first developer dashboard."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://caleb-guyer.github.io/DevTab/" />
@@ -28,10 +28,15 @@
         <a class="brand" href="./" aria-label="DevTab home">
           <span class="brand-mark" aria-hidden="true">//</span>
           <span class="brand-name">devtab</span>
-          <span class="brand-version" aria-hidden="true">v2.0</span>
+          <span class="brand-version" aria-hidden="true">v3.0</span>
         </a>
 
         <div class="header-tools">
+          <div class="workspace-switcher">
+            <label class="visually-hidden" for="workspace-select">Active project workspace</label>
+            <select id="workspace-select" aria-label="Active project workspace"></select>
+            <button id="workspace-manage" type="button">Edit</button>
+          </div>
           <button
             id="command-trigger"
             class="command-trigger"
@@ -50,8 +55,9 @@
 
       <main class="dashboard">
         <section class="search-area" aria-labelledby="search-heading">
-          <p class="eyebrow">Local workspace <span aria-hidden="true">/ ready</span></p>
+          <p class="eyebrow">Workspace <span id="workspace-eyebrow">DT / DevTab</span></p>
           <h1 id="search-heading">Open something.</h1>
+          <p id="workspace-description" class="workspace-description">Pick up exactly where you left off.</p>
 
           <form id="search-form" class="search-form" role="search">
             <label class="visually-hidden" for="web-search">Search the web or open a URL</label>
@@ -78,10 +84,166 @@
             <li><kbd>N</kbd><span>notes</span></li>
             <li><kbd>T</kbd><span>theme</span></li>
             <li><kbd>Ctrl K</kbd><span>commands</span></li>
+            <li><kbd>Ctrl 1–9</kbd><span>workspaces</span></li>
           </ul>
         </section>
 
         <div id="dashboard-grid" class="dashboard-grid">
+          <section
+            class="card project-card"
+            aria-labelledby="project-heading"
+            data-dashboard-card="project"
+            data-state="loading"
+            draggable="true"
+          >
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">01 / project context</p>
+                <h2 id="project-heading">Active workspace</h2>
+              </div>
+              <div class="card-header-actions">
+                <button id="project-edit" class="text-button" type="button">Edit workspace</button>
+                <button class="card-drag-handle" type="button" data-card-handle aria-label="Move Active workspace card">↕</button>
+              </div>
+            </header>
+
+            <div class="project-identity">
+              <span id="project-mark" class="project-mark" aria-hidden="true">DT</span>
+              <div class="project-copy">
+                <p id="project-name" class="project-name">DevTab</p>
+                <p id="project-description" class="muted">Pick up exactly where you left off.</p>
+                <a id="project-repository-link" class="project-repository" href="https://github.com/Caleb-Guyer/DevTab" target="_blank" rel="noreferrer">
+                  <span id="project-repository-name">Caleb-Guyer/DevTab</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <p id="project-repository-status" class="cache-status" role="status" aria-live="polite">Loading repository context…</p>
+              </div>
+              <div class="project-primary-actions">
+                <button id="project-launch" class="utility-button" type="button">Launch tabs</button>
+                <button id="project-refresh" class="text-button" type="button">Refresh repo</button>
+              </div>
+            </div>
+
+            <dl class="project-stats" aria-label="Workspace progress">
+              <div><dt>task progress</dt><dd id="project-task-stat">—</dd></div>
+              <div><dt>focus blocks</dt><dd id="project-focus-stat">0</dd></div>
+              <div><dt>saved tabs</dt><dd id="project-tab-stat">0</dd></div>
+              <div><dt>stars</dt><dd id="project-star-stat">—</dd></div>
+              <div><dt>issues</dt><dd id="project-issue-stat">—</dd></div>
+              <div><dt>pull requests</dt><dd id="project-pull-stat">—</dd></div>
+            </dl>
+
+            <section class="project-activity" aria-labelledby="project-commits-heading">
+              <div class="repository-heading-row">
+                <h3 id="project-commits-heading">recent commits</h3>
+                <span id="project-release" class="repository-source">Checking releases…</span>
+              </div>
+              <ul id="project-commits" class="project-commit-list" aria-live="polite">
+                <li class="project-empty">Loading recent commits…</li>
+              </ul>
+            </section>
+          </section>
+
+          <section
+            class="card focus-card"
+            aria-labelledby="focus-heading"
+            data-dashboard-card="focus"
+            draggable="true"
+          >
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">02 / protected time</p>
+                <h2 id="focus-heading">Focus block</h2>
+              </div>
+              <button class="card-drag-handle" type="button" data-card-handle aria-label="Move Focus block card">↕</button>
+            </header>
+            <div class="focus-body">
+              <time id="focus-time" class="focus-time" datetime="PT1500S">25:00</time>
+              <progress id="focus-progress" class="focus-progress" max="1500" value="0">0%</progress>
+              <div class="focus-presets" aria-label="Focus duration">
+                <button type="button" data-focus-minutes="15">15m</button>
+                <button type="button" data-focus-minutes="25">25m</button>
+                <button type="button" data-focus-minutes="50">50m</button>
+              </div>
+              <label class="select-label" for="focus-task">Linked task</label>
+              <select id="focus-task"><option value="">No linked task</option></select>
+              <div class="focus-actions">
+                <button id="focus-toggle" class="utility-button" type="button">Start focus</button>
+                <button id="focus-reset" class="text-button" type="button">Reset</button>
+              </div>
+              <p id="focus-sessions" class="focus-sessions">0 sessions completed</p>
+              <p id="focus-status" class="focus-status" role="status" aria-live="polite" data-auto="true">Choose a task, set a duration, and protect the block.</p>
+            </div>
+          </section>
+
+          <section
+            class="card tasks-card"
+            aria-labelledby="tasks-heading"
+            data-dashboard-card="tasks"
+            draggable="true"
+          >
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">03 / next actions</p>
+                <h2 id="tasks-heading">Project queue</h2>
+              </div>
+              <div class="card-header-actions">
+                <select id="task-filter" class="compact-select" aria-label="Filter tasks">
+                  <option value="all">All tasks</option>
+                  <option value="open">Open</option>
+                  <option value="done">Completed</option>
+                </select>
+                <button class="card-drag-handle" type="button" data-card-handle aria-label="Move Project queue card">↕</button>
+              </div>
+            </header>
+            <form id="task-form" class="task-form">
+              <label class="visually-hidden" for="task-input">New project task</label>
+              <input id="task-input" type="text" maxlength="160" placeholder="Add the next concrete step…" required />
+              <button type="submit">Add task</button>
+            </form>
+            <div class="task-progress-row">
+              <progress id="task-progress" max="1" value="0">0%</progress>
+              <span id="task-progress-summary">No tasks yet · add the next concrete step</span>
+            </div>
+            <ul id="task-list" class="task-list" aria-live="polite"></ul>
+            <div class="task-footer">
+              <button id="clear-completed-tasks" class="text-button" type="button" disabled>Clear completed</button>
+              <span>Command: <code>task &lt;text&gt;</code></span>
+            </div>
+          </section>
+
+          <section
+            class="card session-card"
+            aria-labelledby="session-heading"
+            data-dashboard-card="session"
+            draggable="true"
+          >
+            <header class="card-header">
+              <div>
+                <p class="card-kicker">04 / browser state</p>
+                <h2 id="session-heading">Saved tab session</h2>
+              </div>
+              <button class="card-drag-handle" type="button" data-card-handle aria-label="Move Saved tab session card">↕</button>
+            </header>
+            <div class="session-toolbar">
+              <div>
+                <p id="session-mode" class="session-mode">Checking browser capabilities…</p>
+                <p id="session-status" class="session-status" role="status" aria-live="polite">Loading saved session…</p>
+              </div>
+              <div class="session-actions">
+                <button id="session-capture" class="utility-button" type="button">Capture window</button>
+                <button id="session-restore" class="utility-button" type="button">Restore tabs</button>
+                <button id="session-clear" class="text-button" type="button">Clear</button>
+              </div>
+            </div>
+            <form id="session-form" class="session-form">
+              <label class="visually-hidden" for="session-url">Add a URL to the saved session</label>
+              <input id="session-url" type="text" inputmode="url" placeholder="Add localhost, docs, or another project URL…" required />
+              <button type="submit">Add URL</button>
+            </form>
+            <ul id="session-list" class="session-list" aria-live="polite"></ul>
+          </section>
+
           <section
             class="card weather-card"
             aria-labelledby="weather-heading"
@@ -90,7 +252,7 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">01 / local</p>
+                <p class="card-kicker">05 / local</p>
                 <h2 id="weather-heading">Weather</h2>
               </div>
               <div class="card-header-actions">
@@ -151,7 +313,7 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">02 / activity</p>
+                <p class="card-kicker">06 / activity</p>
                 <h2 id="github-heading">GitHub / Caleb</h2>
               </div>
               <div class="card-header-actions">
@@ -242,7 +404,7 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">03 / bookmarks</p>
+                <p class="card-kicker">07 / bookmarks</p>
                 <h2 id="quick-links-heading">Jump list</h2>
               </div>
               <div class="card-header-actions">
@@ -266,7 +428,7 @@
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">04 / local files</p>
+                <p class="card-kicker">08 / local files</p>
                 <h2 id="notes-heading">Notes</h2>
               </div>
               <div class="card-header-actions note-actions">
@@ -316,7 +478,7 @@
           <aside class="card settings-card" aria-labelledby="settings-heading" aria-keyshortcuts="T">
             <header class="card-header">
               <div>
-                <p class="card-kicker">05 / preferences</p>
+                <p class="card-kicker">09 / preferences</p>
                 <h2 id="settings-heading">Display &amp; data</h2>
               </div>
               <span class="card-icon" aria-hidden="true">CFG.05</span>
@@ -358,6 +520,10 @@
                 <fieldset class="preference-group" data-setting-group="visibleCards">
                   <legend>visible cards</legend>
                   <div class="choice-options card-visibility-options">
+                    <label><input type="checkbox" name="visible-card" value="project" /><span>Project</span></label>
+                    <label><input type="checkbox" name="visible-card" value="tasks" /><span>Tasks</span></label>
+                    <label><input type="checkbox" name="visible-card" value="focus" /><span>Focus</span></label>
+                    <label><input type="checkbox" name="visible-card" value="session" /><span>Tab session</span></label>
                     <label><input type="checkbox" name="visible-card" value="weather" /><span>Weather</span></label>
                     <label><input type="checkbox" name="visible-card" value="github" /><span>GitHub</span></label>
                     <label><input type="checkbox" name="visible-card" value="links" /><span>Jump list</span></label>
@@ -408,6 +574,62 @@
       </main>
     </div>
 
+    <dialog id="workspace-dialog" class="app-dialog workspace-dialog" aria-labelledby="workspace-dialog-heading">
+      <form id="workspace-form">
+        <div class="dialog-header">
+          <div>
+            <p class="card-kicker">project context</p>
+            <h2 id="workspace-dialog-heading">Edit workspace</h2>
+          </div>
+          <button id="workspace-dialog-close" class="dialog-close" type="button" aria-label="Close workspace editor">Esc</button>
+        </div>
+        <input id="workspace-id" type="hidden" />
+        <div class="workspace-form-grid">
+          <label>
+            <span>Name</span>
+            <input id="workspace-name" type="text" maxlength="80" placeholder="Portfolio" required />
+          </label>
+          <label>
+            <span>Command</span>
+            <span class="input-prefix"><span>workspace</span><input id="workspace-command" type="text" maxlength="40" placeholder="portfolio" /></span>
+          </label>
+          <label>
+            <span>Mark</span>
+            <input id="workspace-icon" type="text" maxlength="3" placeholder="PF" />
+          </label>
+          <label>
+            <span>Accent</span>
+            <select id="workspace-accent">
+              <option value="mint">Mint</option>
+              <option value="violet">Violet</option>
+              <option value="amber">Amber</option>
+              <option value="azure">Azure</option>
+            </select>
+          </label>
+          <label class="workspace-field-wide">
+            <span>Purpose</span>
+            <textarea id="workspace-dialog-description" rows="3" maxlength="240" placeholder="What are you trying to ship?"></textarea>
+          </label>
+          <label class="workspace-field-wide">
+            <span>Public GitHub repository</span>
+            <input id="workspace-repository" type="text" maxlength="200" placeholder="owner/repository or GitHub URL" />
+          </label>
+        </div>
+        <p id="workspace-error" class="form-error workspace-error" role="alert" hidden></p>
+        <div class="workspace-dialog-actions">
+          <div>
+            <button id="workspace-new" class="text-button" type="button">New workspace</button>
+            <button id="workspace-duplicate" class="text-button" type="button">Duplicate</button>
+            <button id="workspace-delete" class="text-button danger-button" type="button">Delete</button>
+          </div>
+          <div>
+            <button id="workspace-cancel" class="text-button" type="button">Cancel</button>
+            <button class="utility-button" type="submit">Save workspace</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
     <dialog id="command-dialog" class="app-dialog command-dialog" aria-labelledby="command-heading">
       <div class="dialog-header">
         <div>
@@ -417,7 +639,7 @@
         <button id="command-close" class="dialog-close" type="button" aria-label="Close command launcher">Esc</button>
       </div>
       <label class="visually-hidden" for="command-input">Command</label>
-      <input id="command-input" class="command-input" type="text" autocomplete="off" placeholder="Try: gh DevTab, calc 12 * 4, theme amber&hellip;" />
+      <input id="command-input" class="command-input" type="text" autocomplete="off" placeholder="Try: workspace devtab, task ship release, focus 25&hellip;" />
       <p id="command-feedback" class="command-feedback" role="status" aria-live="polite">Type a command or choose an action.</p>
       <ul id="command-results" class="command-results" role="listbox"></ul>
     </dialog>
