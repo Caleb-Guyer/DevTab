@@ -3,10 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#11110f" />
     <meta
       name="description"
-      content="DevTab is a developer-focused new tab experience."
+      content="DevTab is a keyboard-first, customizable developer new-tab dashboard."
     />
+    <meta property="og:title" content="DevTab — a keyboard-first developer dashboard" />
+    <meta
+      property="og:description"
+      content="Search, launch commands, check GitHub and weather, and keep local Markdown notes from one fast new tab."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://caleb-guyer.github.io/DevTab/" />
+    <meta property="og:image" content="https://caleb-guyer.github.io/DevTab/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://caleb-guyer.github.io/DevTab/" />
+    <link rel="icon" type="image/png" href="%BASE_URL%icon-32.png" />
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <title>DevTab</title>
   </head>
   <body>
@@ -15,13 +28,24 @@
         <a class="brand" href="./" aria-label="DevTab home">
           <span class="brand-mark" aria-hidden="true">//</span>
           <span class="brand-name">devtab</span>
-          <span class="brand-version" aria-hidden="true">v1.0</span>
+          <span class="brand-version" aria-hidden="true">v2.0</span>
         </a>
 
-        <time id="clock" class="clock" datetime="" aria-label="Local date and time">
-          <span id="clock-time" class="clock-time">--:--</span>
-          <span id="clock-date" class="clock-date">Loading date</span>
-        </time>
+        <div class="header-tools">
+          <button
+            id="command-trigger"
+            class="command-trigger"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls="command-dialog"
+          >
+            Command <kbd>Ctrl K</kbd>
+          </button>
+          <time id="clock" class="clock" datetime="" aria-label="Local date and time">
+            <span id="clock-time" class="clock-time">--:--</span>
+            <span id="clock-date" class="clock-date">Loading date</span>
+          </time>
+        </div>
       </header>
 
       <main class="dashboard">
@@ -29,43 +53,50 @@
           <p class="eyebrow">Local workspace <span aria-hidden="true">/ ready</span></p>
           <h1 id="search-heading">Open something.</h1>
 
-          <form
-            class="search-form"
-            role="search"
-            action="https://www.google.com/search"
-            method="get"
-          >
-            <label class="visually-hidden" for="web-search">Search the web</label>
+          <form id="search-form" class="search-form" role="search">
+            <label class="visually-hidden" for="web-search">Search the web or open a URL</label>
             <input
               id="web-search"
               name="q"
               type="search"
-              placeholder="Search the web&hellip;"
+              placeholder="Search, paste a URL, or type &gt; for commands&hellip;"
               autocomplete="off"
               aria-keyshortcuts="/"
             />
+            <label class="visually-hidden" for="search-engine">Search engine</label>
+            <select id="search-engine" class="search-engine" aria-label="Search engine">
+              <option value="google">Google</option>
+              <option value="duckduckgo">DuckDuckGo</option>
+              <option value="github">GitHub</option>
+              <option value="mdn">MDN</option>
+            </select>
             <button type="submit">Go <span aria-hidden="true">↗</span></button>
           </form>
 
           <ul class="shortcut-guide" aria-label="Keyboard shortcuts">
-            <li><kbd>/</kbd><span>Search</span></li>
-            <li><kbd>N</kbd><span>Notes</span></li>
-            <li><kbd>T</kbd><span>Theme</span></li>
+            <li><kbd>/</kbd><span>search</span></li>
+            <li><kbd>N</kbd><span>notes</span></li>
+            <li><kbd>T</kbd><span>theme</span></li>
+            <li><kbd>Ctrl K</kbd><span>commands</span></li>
           </ul>
         </section>
 
-        <div class="dashboard-grid">
+        <div id="dashboard-grid" class="dashboard-grid">
           <section
             class="card weather-card"
             aria-labelledby="weather-heading"
             data-dashboard-card="weather"
+            draggable="true"
           >
             <header class="card-header">
               <div>
                 <p class="card-kicker">01 / local</p>
                 <h2 id="weather-heading">Weather</h2>
               </div>
-              <span class="card-icon" aria-hidden="true">WX.01</span>
+              <div class="card-header-actions">
+                <span class="card-icon" aria-hidden="true">WX.01</span>
+                <button class="card-drag-handle" type="button" data-card-handle aria-label="Move Weather card">↕</button>
+              </div>
             </header>
 
             <div
@@ -82,21 +113,31 @@
                 <p id="weather-location" class="weather-location muted">
                   Browser permission may be required.
                 </p>
+                <p id="weather-cache-status" class="cache-status" hidden></p>
               </div>
             </div>
+
+            <form id="weather-form" class="weather-controls">
+              <label for="weather-place">Location</label>
+              <div class="weather-control-row">
+                <input id="weather-place" name="weather-place" type="search" placeholder="City or place" />
+                <select id="weather-unit" name="weather-unit" aria-label="Temperature unit">
+                  <option value="auto">Auto unit</option>
+                  <option value="fahrenheit">°F</option>
+                  <option value="celsius">°C</option>
+                </select>
+                <button type="submit">Set</button>
+              </div>
+              <button id="weather-auto" class="text-button" type="button">Use device location</button>
+            </form>
 
             <button id="weather-retry" class="weather-retry" type="button" hidden>
               Try again
             </button>
 
             <p class="weather-credit">
-              Weather by
+              Weather and geocoding by
               <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a>
-              <span aria-hidden="true">/</span>
-              Location by
-              <a href="https://www.bigdatacloud.com/" target="_blank" rel="noreferrer">
-                BigDataCloud
-              </a>
             </p>
           </section>
 
@@ -106,95 +147,114 @@
             aria-busy="true"
             data-state="loading"
             data-dashboard-card="github"
+            draggable="true"
           >
             <header class="card-header">
               <div>
                 <p class="card-kicker">02 / activity</p>
                 <h2 id="github-heading">GitHub / Caleb</h2>
               </div>
-              <a
-                id="github-profile-link"
-                class="text-link"
-                href="https://github.com/Caleb-Guyer"
-                target="_blank"
-                rel="noreferrer"
-              >View profile</a>
+              <div class="card-header-actions">
+                <a
+                  id="github-profile-link"
+                  class="text-link"
+                  href="https://github.com/Caleb-Guyer"
+                  target="_blank"
+                  rel="noreferrer"
+                >Profile</a>
+                <button class="card-drag-handle" type="button" data-card-handle aria-label="Move GitHub card">↕</button>
+              </div>
             </header>
 
             <div class="profile-summary" aria-live="polite">
               <img id="github-avatar" class="profile-avatar" alt="" hidden />
-              <span id="github-avatar-placeholder" class="profile-avatar" aria-hidden="true">
-                GH
-              </span>
+              <span id="github-avatar-placeholder" class="profile-avatar" aria-hidden="true">GH</span>
               <div>
                 <p id="github-username" class="profile-name">@Caleb-Guyer</p>
                 <p id="github-summary" class="muted">Loading public profile&hellip;</p>
+                <p id="github-cache-status" class="cache-status" hidden></p>
+              </div>
+              <div class="github-actions">
+                <a href="https://github.com/new" target="_blank" rel="noreferrer">New repository</a>
+                <a href="https://github.com/issues" target="_blank" rel="noreferrer">Issues</a>
               </div>
             </div>
 
             <dl class="github-stats">
               <div>
-                <dt>Public repositories</dt>
+                <dt>repositories</dt>
                 <dd id="github-repository-count">--</dd>
               </div>
               <div>
-                <dt>Followers</dt>
+                <dt>followers</dt>
                 <dd id="github-follower-count">--</dd>
+              </div>
+              <div>
+                <dt>open items</dt>
+                <dd id="github-open-count">--</dd>
               </div>
             </dl>
 
             <section class="recent-repositories" aria-labelledby="repositories-heading">
               <div class="repository-heading-row">
-                <h3 id="repositories-heading">Recently updated</h3>
-                <span class="repository-source">Public repositories</span>
+                <h3 id="repositories-heading">repositories</h3>
+                <span class="repository-source">public API / no token</span>
+              </div>
+              <div class="github-filters">
+                <label>
+                  <span class="visually-hidden">Filter repositories</span>
+                  <input id="repository-filter" type="search" placeholder="Filter repositories&hellip;" />
+                </label>
+                <label class="filter-switch">
+                  <input id="favorite-filter" type="checkbox" />
+                  <span>favorites only</span>
+                </label>
               </div>
               <ul id="github-repositories" class="repository-list" aria-live="polite">
-                <li class="repository-message">Loading repositories&hellip;</li>
+                <li class="repository-loading-item" aria-hidden="true"></li>
+                <li class="repository-loading-item" aria-hidden="true"></li>
+                <li class="repository-loading-item" aria-hidden="true"></li>
+                <li class="repository-loading-item" aria-hidden="true"></li>
+                <li class="repository-loading-item" aria-hidden="true"></li>
+                <li class="repository-loading-item" aria-hidden="true"></li>
               </ul>
             </section>
 
-            <button id="github-retry" class="github-retry" type="button" hidden>
-              Retry GitHub
-            </button>
+            <section class="github-events" aria-labelledby="events-heading">
+              <div class="repository-heading-row">
+                <h3 id="events-heading">recent public events</h3>
+              </div>
+              <ul id="github-events" class="event-list" aria-live="polite">
+                <li class="event-loading-item" aria-hidden="true"></li>
+                <li class="event-loading-item" aria-hidden="true"></li>
+                <li class="event-loading-item" aria-hidden="true"></li>
+              </ul>
+            </section>
+
+            <button id="github-retry" class="github-retry" type="button" hidden>Retry GitHub</button>
           </section>
 
           <nav
             class="card quick-links"
             aria-labelledby="quick-links-heading"
             data-dashboard-card="links"
+            draggable="true"
           >
             <header class="card-header">
               <div>
                 <p class="card-kicker">03 / bookmarks</p>
                 <h2 id="quick-links-heading">Jump list</h2>
               </div>
+              <div class="card-header-actions">
+                <button id="add-link" class="text-button" type="button">Add</button>
+                <button class="card-drag-handle" type="button" data-card-handle aria-label="Move Jump list card">↕</button>
+              </div>
             </header>
-
-            <ul class="link-list">
-              <li>
-                <a href="https://github.com/" target="_blank" rel="noreferrer">
-                  <span class="link-mark" aria-hidden="true">GH</span>
-                  <span>GitHub</span>
-                </a>
-              </li>
-              <li>
-                <a href="https://developer.mozilla.org/" target="_blank" rel="noreferrer">
-                  <span class="link-mark" aria-hidden="true">MDN</span>
-                  <span>MDN</span>
-                </a>
-              </li>
-              <li>
-                <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-                  <span class="link-mark" aria-hidden="true">V</span>
-                  <span>Vite</span>
-                </a>
-              </li>
-              <li>
-                <a href="https://stackoverflow.com/" target="_blank" rel="noreferrer">
-                  <span class="link-mark" aria-hidden="true">SO</span>
-                  <span>Stack Overflow</span>
-                </a>
-              </li>
+            <ul id="quick-links-list" class="link-list">
+              <li class="link-loading-item" aria-hidden="true"></li>
+              <li class="link-loading-item" aria-hidden="true"></li>
+              <li class="link-loading-item" aria-hidden="true"></li>
+              <li class="link-loading-item" aria-hidden="true"></li>
             </ul>
           </nav>
 
@@ -202,149 +262,189 @@
             class="card notes-card"
             aria-labelledby="notes-heading"
             data-dashboard-card="notes"
+            draggable="true"
           >
             <header class="card-header">
               <div>
-                <p class="card-kicker">04 / local file</p>
-                <h2 id="notes-heading">Scratch</h2>
+                <p class="card-kicker">04 / local files</p>
+                <h2 id="notes-heading">Notes</h2>
               </div>
-              <div class="note-actions">
-                <span
-                  id="note-status"
-                  class="save-status"
-                  role="status"
-                  aria-live="polite"
-                  data-state="saved"
-                >Saved</span>
-                <button id="clear-note" class="clear-note" type="button" disabled>
-                  Clear
-                </button>
+              <div class="card-header-actions note-actions">
+                <span id="note-status" class="save-status" role="status" aria-live="polite" data-state="saved">Saved</span>
+                <button class="card-drag-handle" type="button" data-card-handle aria-label="Move Notes card">↕</button>
               </div>
             </header>
 
-            <label class="visually-hidden" for="quick-note">Quick note</label>
-            <textarea
-              id="quick-note"
-              name="quick-note"
-              rows="7"
-              placeholder="Write down an idea, command, or reminder&hellip;"
-              aria-keyshortcuts="N"
-            ></textarea>
+            <div class="notes-layout">
+              <aside class="notes-sidebar" aria-label="Saved notes">
+                <div class="note-toolbar">
+                  <button id="add-note" class="utility-button" type="button">New note</button>
+                  <label>
+                    <span class="visually-hidden">Search notes</span>
+                    <input id="note-search" type="search" placeholder="Find notes&hellip;" />
+                  </label>
+                </div>
+                <ul id="note-list" class="note-list"></ul>
+              </aside>
+
+              <div class="note-editor">
+                <label class="visually-hidden" for="note-title">Note title</label>
+                <input id="note-title" class="note-title" type="text" maxlength="100" placeholder="Untitled note" />
+                <p id="note-meta" class="note-meta">Created now</p>
+                <label class="visually-hidden" for="quick-note">Note content</label>
+                <textarea
+                  id="quick-note"
+                  name="quick-note"
+                  rows="9"
+                  placeholder="# Idea&#10;- [ ] First step"
+                  aria-keyshortcuts="N"
+                ></textarea>
+                <div class="editor-actions">
+                  <button id="pin-note" class="text-button" type="button">Pin</button>
+                  <button id="download-note" class="text-button" type="button">Download .md</button>
+                  <button id="delete-note" class="text-button danger-button" type="button">Delete</button>
+                </div>
+              </div>
+
+              <section class="note-preview" aria-labelledby="preview-heading">
+                <h3 id="preview-heading">preview</h3>
+                <div id="markdown-preview" class="markdown-preview"></div>
+              </section>
+            </div>
           </section>
 
-          <aside
-            class="card settings-card"
-            aria-labelledby="settings-heading"
-            aria-keyshortcuts="T"
-          >
+          <aside class="card settings-card" aria-labelledby="settings-heading" aria-keyshortcuts="T">
             <header class="card-header">
               <div>
                 <p class="card-kicker">05 / preferences</p>
-                <h2 id="settings-heading">Display</h2>
+                <h2 id="settings-heading">Display &amp; data</h2>
               </div>
               <span class="card-icon" aria-hidden="true">CFG.05</span>
             </header>
 
             <form id="settings-form" class="settings-form">
               <div class="settings-grid">
-                <fieldset class="preference-group">
-                  <legend>Mode</legend>
-                  <div class="choice-options theme-options">
-                    <label>
-                      <input type="radio" name="theme" value="system" checked />
-                      <span>System</span>
-                    </label>
-                    <label>
-                      <input type="radio" name="theme" value="light" />
-                      <span>Light</span>
-                    </label>
-                    <label>
-                      <input type="radio" name="theme" value="dark" />
-                      <span>Dark</span>
-                    </label>
+                <fieldset class="preference-group" data-setting-group="theme">
+                  <legend>mode</legend>
+                  <div class="choice-options">
+                    <label><input type="radio" name="theme" value="system" /><span>System</span></label>
+                    <label><input type="radio" name="theme" value="light" /><span>Light</span></label>
+                    <label><input type="radio" name="theme" value="dark" /><span>Dark</span></label>
                   </div>
+                  <button class="reset-setting" type="button" data-reset-setting="theme">Reset mode</button>
                 </fieldset>
 
-                <fieldset class="preference-group">
-                  <legend>Accent color</legend>
+                <fieldset class="preference-group" data-setting-group="accent">
+                  <legend>accent color</legend>
                   <div class="choice-options accent-options">
-                    <label>
-                      <input type="radio" name="accent" value="mint" checked />
-                      <span class="accent-swatch accent-mint" aria-hidden="true"></span>
-                      <span>Mint</span>
-                    </label>
-                    <label>
-                      <input type="radio" name="accent" value="violet" />
-                      <span class="accent-swatch accent-violet" aria-hidden="true"></span>
-                      <span>Violet</span>
-                    </label>
-                    <label>
-                      <input type="radio" name="accent" value="amber" />
-                      <span class="accent-swatch accent-amber" aria-hidden="true"></span>
-                      <span>Amber</span>
-                    </label>
-                    <label>
-                      <input type="radio" name="accent" value="azure" />
-                      <span class="accent-swatch accent-azure" aria-hidden="true"></span>
-                      <span>Azure</span>
-                    </label>
+                    <label><input type="radio" name="accent" value="mint" /><span class="accent-swatch accent-mint" aria-hidden="true"></span><span>Mint</span></label>
+                    <label><input type="radio" name="accent" value="violet" /><span class="accent-swatch accent-violet" aria-hidden="true"></span><span>Violet</span></label>
+                    <label><input type="radio" name="accent" value="amber" /><span class="accent-swatch accent-amber" aria-hidden="true"></span><span>Amber</span></label>
+                    <label><input type="radio" name="accent" value="azure" /><span class="accent-swatch accent-azure" aria-hidden="true"></span><span>Azure</span></label>
                   </div>
+                  <button class="reset-setting" type="button" data-reset-setting="accent">Reset accent</button>
                 </fieldset>
 
-                <fieldset class="preference-group">
-                  <legend>Background intensity</legend>
-                  <div class="choice-options intensity-options">
-                    <label>
-                      <input type="radio" name="background-intensity" value="subtle" />
-                      <span>Subtle</span>
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="background-intensity"
-                        value="balanced"
-                        checked
-                      />
-                      <span>Balanced</span>
-                    </label>
-                    <label>
-                      <input type="radio" name="background-intensity" value="strong" />
-                      <span>Strong</span>
-                    </label>
+                <fieldset class="preference-group" data-setting-group="backgroundIntensity">
+                  <legend>background</legend>
+                  <div class="choice-options">
+                    <label><input type="radio" name="background-intensity" value="subtle" /><span>Subtle</span></label>
+                    <label><input type="radio" name="background-intensity" value="balanced" /><span>Balanced</span></label>
+                    <label><input type="radio" name="background-intensity" value="strong" /><span>Strong</span></label>
                   </div>
+                  <button class="reset-setting" type="button" data-reset-setting="backgroundIntensity">Reset background</button>
                 </fieldset>
 
-                <fieldset class="preference-group">
-                  <legend>Visible cards</legend>
+                <fieldset class="preference-group" data-setting-group="visibleCards">
+                  <legend>visible cards</legend>
                   <div class="choice-options card-visibility-options">
-                    <label>
-                      <input type="checkbox" name="visible-card" value="weather" checked />
-                      <span>Weather</span>
-                    </label>
-                    <label>
-                      <input type="checkbox" name="visible-card" value="github" checked />
-                      <span>GitHub</span>
-                    </label>
-                    <label>
-                      <input type="checkbox" name="visible-card" value="links" checked />
-                      <span>Quick links</span>
-                    </label>
-                    <label>
-                      <input type="checkbox" name="visible-card" value="notes" checked />
-                      <span>Notes</span>
-                    </label>
+                    <label><input type="checkbox" name="visible-card" value="weather" /><span>Weather</span></label>
+                    <label><input type="checkbox" name="visible-card" value="github" /><span>GitHub</span></label>
+                    <label><input type="checkbox" name="visible-card" value="links" /><span>Jump list</span></label>
+                    <label><input type="checkbox" name="visible-card" value="notes" /><span>Notes</span></label>
                   </div>
+                  <button class="reset-setting" type="button" data-reset-setting="visibleCards">Show all cards</button>
+                </fieldset>
+
+                <fieldset class="preference-group" data-setting-group="searchEngine">
+                  <legend>default search</legend>
+                  <label class="select-label" for="settings-search-engine">Engine</label>
+                  <select id="settings-search-engine" name="settings-search-engine">
+                    <option value="google">Google</option>
+                    <option value="duckduckgo">DuckDuckGo</option>
+                    <option value="github">GitHub</option>
+                    <option value="mdn">MDN</option>
+                  </select>
+                  <button class="reset-setting" type="button" data-reset-setting="searchEngine">Reset search</button>
+                </fieldset>
+
+                <fieldset class="preference-group" data-setting-group="accessibility">
+                  <legend>accessibility</legend>
+                  <label class="select-label" for="contrast-setting">Contrast</label>
+                  <select id="contrast-setting" name="contrast">
+                    <option value="standard">Standard</option>
+                    <option value="high">High contrast</option>
+                  </select>
+                  <label class="select-label" for="motion-setting">Motion</label>
+                  <select id="motion-setting" name="motion">
+                    <option value="system">Follow system</option>
+                    <option value="full">Full motion</option>
+                    <option value="reduced">Reduced motion</option>
+                  </select>
+                  <button class="reset-setting" type="button" data-reset-setting="accessibility">Reset accessibility</button>
                 </fieldset>
               </div>
 
-              <p id="settings-status" class="settings-note" role="status" aria-live="polite">
-                Preferences loaded.
-              </p>
+              <div class="settings-actions">
+                <button id="export-settings" class="utility-button" type="button">Export dashboard</button>
+                <button id="import-settings-button" class="utility-button" type="button">Import dashboard</button>
+                <input id="import-settings" class="visually-hidden" type="file" accept="application/json,.json" aria-label="Import DevTab dashboard backup" />
+                <button id="reset-dashboard" class="text-button danger-button" type="button">Reset all data</button>
+              </div>
+              <p id="settings-status" class="settings-note" role="status" aria-live="polite">Preferences loaded.</p>
             </form>
           </aside>
         </div>
       </main>
     </div>
+
+    <dialog id="command-dialog" class="app-dialog command-dialog" aria-labelledby="command-heading">
+      <div class="dialog-header">
+        <div>
+          <p class="card-kicker">keyboard launcher</p>
+          <h2 id="command-heading">Run a command</h2>
+        </div>
+        <button id="command-close" class="dialog-close" type="button" aria-label="Close command launcher">Esc</button>
+      </div>
+      <label class="visually-hidden" for="command-input">Command</label>
+      <input id="command-input" class="command-input" type="text" autocomplete="off" placeholder="Try: gh DevTab, calc 12 * 4, theme amber&hellip;" />
+      <p id="command-feedback" class="command-feedback" role="status" aria-live="polite">Type a command or choose an action.</p>
+      <ul id="command-results" class="command-results" role="listbox"></ul>
+    </dialog>
+
+    <dialog id="link-dialog" class="app-dialog link-dialog" aria-labelledby="link-dialog-heading">
+      <form id="link-form">
+        <div class="dialog-header">
+          <div>
+            <p class="card-kicker">jump list</p>
+            <h2 id="link-dialog-heading">Add a link</h2>
+          </div>
+          <button id="link-dialog-close" class="dialog-close" type="button" aria-label="Close link editor">Esc</button>
+        </div>
+        <input id="link-id" type="hidden" />
+        <label for="link-label">Label</label>
+        <input id="link-label" type="text" maxlength="80" required />
+        <label for="link-url">URL</label>
+        <input id="link-url" type="text" inputmode="url" placeholder="https://example.com" required />
+        <p id="link-error" class="form-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button id="link-cancel" class="text-button" type="button">Cancel</button>
+          <button class="utility-button" type="submit">Save link</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

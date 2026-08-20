@@ -1,12 +1,17 @@
 {
   "name": "devtab",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "build:extension": "vite build --base ./ --outDir dist-extension",
+    "preview": "vite preview",
+    "test": "node --test",
+    "check": "npm run test && npm run build",
+    "audit": "npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json",
+    "assets": "node scripts/generate-assets.mjs"
   },
   "devDependencies": {
     "vite": "^8.2.0"

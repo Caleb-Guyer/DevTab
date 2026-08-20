@@ -4,9 +4,11 @@ node_modules/
 # Production builds
 dist/
 dist-ssr/
+dist-extension/
 
 # Test coverage
 coverage/
+.lighthouseci/
 
 # Vite cache
 .vite/
